@@ -1,19 +1,25 @@
 .navbar {
     display: grid;
+    height: 50px;
     grid-template-columns: 1fr auto 1fr;
     /* Three columns */
     align-items: center;
-    background-color:#004b34;
-}
-
-.loginContainer {
-    display: flex;
-    justify-content: flex-end;
-    /* Push contents to the right */
-    padding-right: 0vw;
-    /* roughly 1/10 of the viewport width from the right */
+    background-color: #004b34;
+    color: white;
 }
 
 .logo {
+    grid-column: 2;
+    /* Places the logo in the center column */
     text-align: center;
+}
+
+.loginContainer {
+    grid-column: 3;
+    /* Places the login container in the rightmost column */
+    display: flex;
+    justify-content: flex-end;
+    /* Push contents to the right */
+    padding-right: 1vw;
+    /* roughly 1/10 of the viewport width from the right */
 }

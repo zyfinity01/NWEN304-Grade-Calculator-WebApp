@@ -3,31 +3,42 @@ import React, { useState } from 'react';
 import "./Home.css";
 //import "../CalcLogic.js";
 
+// ... Your existing imports ...
+
 const Home = () => {
-    const [course, setCourse] = useState(''); // State to manage course input
+    const [course, setCourse] = useState('');
+    const [grade, setGrade] = useState('');
 
     const handleGradeCalculation = () => {
-        // Logic to calculate grades
         console.log('Calculating grades...');
-        //CalcLogic();
     };
 
     return (
         <div className="homeContainer">
             <h1>Welcome to the Grade Calculator</h1>
 
-            {/* UI for grade calculation */}
             <div className="gradeCalculationUI">
+                <div className="courseAndButton">
+                    <input
+                        type="text"
+                        value={course}
+                        onChange={e => setCourse(e.target.value)}
+                        placeholder="Enter Course"
+                        className="courseInput"
+                    />
+                    
+                </div>
                 <input
                     type="text"
-                    value={course}
-                    onChange={e => setCourse(e.target.value)}
-                    placeholder="Enter Course"
-                    className="courseInput"
+                    value={grade}
+                    onChange={e => setGrade(e.target.value)}
+                    placeholder="Enter Grade"
+                    className="gradeInput"
                 />
                 <button onClick={handleGradeCalculation} className="calculateBtn">
                     Calculate Grades
                 </button>
+
             </div>
         </div>
     );
