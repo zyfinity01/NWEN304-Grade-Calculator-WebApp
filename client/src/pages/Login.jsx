@@ -2,17 +2,22 @@ import Google from "../img/google.png";
 import Facebook from "../img/facebook.png";
 import Github from "../img/github.png";
 
+
 const Login = () => {
+  const apiUrl = process.env.REACT_APP_BACKEND_API_URL;
+
   const google = () => {
-    window.open("http://localhost:5000/auth/google", "_self");
+    console.log(process.env);
+    console.log(`${apiUrl}auth/google`);
+    window.open(`${apiUrl}auth/google`, "_self");
   };
 
   const github = () => {
-    window.open("http://localhost:5000/auth/github", "_self");
+    window.open(`${apiUrl}auth/github`, "_self");
   };
 
   const facebook = () => {
-    window.open("http://localhost:5000/auth/facebook", "_self");
+    window.open(`${apiUrl}auth/facebook`, "_self");
   };
 
   return (

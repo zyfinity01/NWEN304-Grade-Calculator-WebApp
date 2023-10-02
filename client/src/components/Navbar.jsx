@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 
+
+
 const Navbar = ({ user }) => {
   const logout = () => {
-    window.open("http://localhost:5000/auth/logout", "_self");
+    window.open(`${process.env.REACT_APP_BACKEND_API_URL}auth/logout`, "_self");
   };
 
   return (
