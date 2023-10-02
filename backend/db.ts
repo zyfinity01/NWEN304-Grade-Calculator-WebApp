@@ -1,5 +1,5 @@
-import {ConnectOptions, MongoClient, ServerApiVersion} from 'mongodb';
-import fs = require('fs');
+const { MongoClient, ServerApiVersion, ConnectOptions } = require('mongodb');
+const fs = require('fs');
 
 async function connect() {
     const uri = process.env.MONGODB_URI;
@@ -8,7 +8,7 @@ async function connect() {
         sslKey: credentials,
         sslCert: credentials,
         serverApi: ServerApiVersion.v1
-    } as ConnectOptions);
+    } as typeof ConnectOptions);
     return client.connect();
 }
 
