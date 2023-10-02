@@ -1,14 +1,35 @@
-import Card from "../components/Card"
-import {posts} from "../data"
+// Home.js
+import React, { useState } from 'react';
+import "./Home.css";
 
 const Home = () => {
-    return (
-        <div className="home">
-            {posts.map(post=>(
-                <Card key={post.id} post={post}/>
-            ))}
-        </div>
-    )
-}
+    const [course, setCourse] = useState(''); // State to manage course input
 
-export default Home
+    const handleGradeCalculation = () => {
+        // Logic to calculate grades
+        console.log('Calculating grades...');
+        CalcLogic();
+    };
+
+    return (
+        <div className="homeContainer">
+            <h1>Welcome to the Grade Calculator</h1>
+
+            {/* UI for grade calculation */}
+            <div className="gradeCalculationUI">
+                <input
+                    type="text"
+                    value={course}
+                    onChange={e => setCourse(e.target.value)}
+                    placeholder="Enter Course"
+                    className="courseInput"
+                />
+                <button onClick={handleGradeCalculation} className="calculateBtn">
+                    Calculate Grades
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default Home;

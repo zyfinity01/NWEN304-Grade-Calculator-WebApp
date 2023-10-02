@@ -7,8 +7,8 @@ const Navbar = ({ user }) => {
   };
 
   return (
-    <div className="navbar">
-      <div></div>  {/* This is an empty div for the first grid column */}
+    <div className="navbar" >
+      <div ></div>  {/* This is an empty div for the first grid column */}
       <span className="logo">Grade Calculator</span>
       {user ? (
         <ul className="list">
@@ -25,7 +25,7 @@ const Navbar = ({ user }) => {
           </li>
         </ul>
       ) : (
-        <div className="loginContainer">
+          <div className="loginContainer">
           <Link className="link" to="login">
             Login
           </Link>

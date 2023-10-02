@@ -3,6 +3,7 @@
     grid-template-columns: 1fr auto 1fr;
     /* Three columns */
     align-items: center;
+    background-color:#004b34;
 }
 
 .loginContainer {
