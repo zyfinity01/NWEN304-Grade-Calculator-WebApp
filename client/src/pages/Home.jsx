@@ -36,7 +36,7 @@ const Home = () => {
                     className="gradeInput"
                 />
                 <button onClick={handleGradeCalculation} className="calculateBtn">
-                    Calculate Grades
+                    Calculate Grades - test
                 </button>
 
             </div>
