@@ -1,21 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import Navbar from './Navbar.tsx';
 
-function App() {
+const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Assume a proper check or an API call to determine if a user is logged in
+  
   return (
     <div className="App">
+      <Navbar isLoggedIn={isLoggedIn} onLogin={() => setIsLoggedIn(true)} />
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Test
-        </a>
+        <h1>Welcome to Home Page</h1>
       </header>
     </div>
   );
-}
+};
 
 export default App;
