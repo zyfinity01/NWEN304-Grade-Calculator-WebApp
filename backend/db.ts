@@ -16,7 +16,7 @@ async function connect() {
     return client.connect();
 }
 
-async function getCollection(collectionName: string) {
+async function getCollection(collectionName) {
     const conn = await connect();
     return conn.db(process.env.MONGO_DB_NAME).collection(collectionName);
 }
