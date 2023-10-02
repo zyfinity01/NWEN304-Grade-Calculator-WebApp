@@ -1,14 +1,14 @@
-const { MongoClient, ServerApiVersion, ConnectOptions } = require('mongodb');
-const fs = require('fs');
+const {MongoClient, ServerApiVersion} = require('mongodb');
 
 async function connect() {
-    const uri = process.env.MONGODB_URI;
-    const credentials = fs.readFileSync(process.env.MONGO_CERT_PATH).toString();
+    const uri = process.env.MONGO_URL.slice(1, -1)
     const client = new MongoClient(uri, {
-        sslKey: credentials,
-        sslCert: credentials,
-        serverApi: ServerApiVersion.v1
-    } as typeof ConnectOptions);
+        serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true,
+        }
+    });
     return client.connect();
 }
 
@@ -19,7 +19,7 @@ async function getCollection(collectionName) {
 
 async function testConnection() {
     const conn = await connect();
-    const result = await conn.db(process.env.MONGO_DB_NAME).command({ ping: 1 });
+    const result = await conn.db(process.env.MONGO_DB_NAME).command({ping: 1});
     return result.ok === 1;
 }
 
