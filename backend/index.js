@@ -1,4 +1,6 @@
-require('dotenv').config()
+const dotenv = require('dotenv')
+dotenv.config()
+dotenv.config({ path: `.local.env`, override: true });
 const cookieSession = require("cookie-session");
 const express = require("express");
 const cors = require("cors");
