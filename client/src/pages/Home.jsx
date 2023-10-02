@@ -1,18 +1,7 @@
-// Home.js
-import React, { useState } from 'react';
-import "./Home.css";
-//import "../CalcLogic.js";
-
-// ... Your existing imports ...
+import Card from "../components/Card"
+import {posts} from "../data"
 
 const Home = () => {
-    const [course, setCourse] = useState('');
-    const [grade, setGrade] = useState('');
-
-    const handleGradeCalculation = () => {
-        console.log('Calculating grades...');
-    };
-
     return (
         <div className="homeContainer">
             <h1>Welcome to the VUW Grade Calculator</h1>
@@ -41,7 +30,7 @@ const Home = () => {
 
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Home;
+export default Home
