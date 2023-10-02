@@ -1,6 +1,7 @@
 // Home.js
 import React, { useState } from 'react';
 import "./Home.css";
+//import "../CalcLogic.js";
 
 const Home = () => {
     const [course, setCourse] = useState(''); // State to manage course input
@@ -8,7 +9,7 @@ const Home = () => {
     const handleGradeCalculation = () => {
         // Logic to calculate grades
         console.log('Calculating grades...');
-        CalcLogic();
+        //CalcLogic();
     };
 
     return (

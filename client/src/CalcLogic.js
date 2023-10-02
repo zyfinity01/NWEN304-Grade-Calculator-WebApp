@@ -1,3 +1,5 @@
+//import "../../db.js"
+
 const readline = require('readline');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
