@@ -15,7 +15,7 @@ const Home = () => {
 
     return (
         <div className="homeContainer">
-            <h1>Welcome to the Grade Calculator</h1>
+            <h1>Welcome to the VUW Grade Calculator</h1>
 
             <div className="gradeCalculationUI">
                 <div className="courseAndButton">
