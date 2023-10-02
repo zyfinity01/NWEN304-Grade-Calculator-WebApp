@@ -1,0 +1,15 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.list {
+    display: flex;
+    gap: 16px;
+}

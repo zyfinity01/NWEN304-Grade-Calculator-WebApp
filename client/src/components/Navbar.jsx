@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = ({ user }) => {
   const logout = () => {
@@ -8,7 +9,7 @@ const Navbar = ({ user }) => {
     <div className="navbar">
       <span className="logo">
         <Link className="link" to="/">
-          Lama App
+          Grade Calculator
         </Link>
       </span>
       {user ? (
