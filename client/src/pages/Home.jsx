@@ -1,14 +1,47 @@
-import Card from "../components/Card"
-import {posts} from "../data"
+// Home.js
+import React, { useState } from 'react';
+import "./Home.css";
+//import "../CalcLogic.js";
+
+// ... Your existing imports ...
 
 const Home = () => {
-    return (
-        <div className="home">
-            {posts.map(post=>(
-                <Card key={post.id} post={post}/>
-            ))}
-        </div>
-    )
-}
+    const [course, setCourse] = useState('');
+    const [grade, setGrade] = useState('');
 
-export default Home
+    const handleGradeCalculation = () => {
+        console.log('Calculating grades...');
+    };
+
+    return (
+        <div className="homeContainer">
+            <h1>Welcome to the Grade Calculator</h1>
+
+            <div className="gradeCalculationUI">
+                <div className="courseAndButton">
+                    <input
+                        type="text"
+                        value={course}
+                        onChange={e => setCourse(e.target.value)}
+                        placeholder="Enter Course"
+                        className="courseInput"
+                    />
+                    
+                </div>
+                <input
+                    type="text"
+                    value={grade}
+                    onChange={e => setGrade(e.target.value)}
+                    placeholder="Enter Grade"
+                    className="gradeInput"
+                />
+                <button onClick={handleGradeCalculation} className="calculateBtn">
+                    Calculate Grades
+                </button>
+
+            </div>
+        </div>
+    );
+};
+
+export default Home;
