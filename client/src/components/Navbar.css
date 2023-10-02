@@ -1,15 +1,18 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    /* Three columns */
     align-items: center;
 }
 
-.logo {
-    flex-grow: 1;
-    text-align: center;
+.loginContainer {
+    display: flex;
+    justify-content: flex-end;
+    /* Push contents to the right */
+    padding-right: 0vw;
+    /* roughly 1/10 of the viewport width from the right */
 }
 
-.list {
-    display: flex;
-    gap: 16px;
+.logo {
+    text-align: center;
 }

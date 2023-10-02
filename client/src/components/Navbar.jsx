@@ -5,13 +5,11 @@ const Navbar = ({ user }) => {
   const logout = () => {
     window.open("http://localhost:5000/auth/logout", "_self");
   };
+
   return (
     <div className="navbar">
-      <span className="logo">
-        <Link className="link" to="/">
-          Grade Calculator
-        </Link>
-      </span>
+      <div></div>  {/* This is an empty div for the first grid column */}
+      <span className="logo">Grade Calculator</span>
       {user ? (
         <ul className="list">
           <li className="listItem">
@@ -27,11 +25,14 @@ const Navbar = ({ user }) => {
           </li>
         </ul>
       ) : (
-        <Link className="link" to="login">
-          Login
-        </Link>
+        <div className="loginContainer">
+          <Link className="link" to="login">
+            Login
+          </Link>
+        </div>
       )}
     </div>
+
   );
 };
 
