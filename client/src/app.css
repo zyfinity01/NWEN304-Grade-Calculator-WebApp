@@ -1,12 +1,3 @@
-.navbar {
-  height: 50px;
-  background-color: rgba(102, 16, 83, 0.698);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
 .logo {
   font-size: 20px;
   font-weight: bold;
@@ -38,14 +29,6 @@
   flex-wrap: wrap;
 }
 
-.card {
-  width: 30%;
-  padding: 10px;
-  border-radius: 20px;
-  -webkit-box-shadow: 0px 5px 33px -21px rgba(66, 68, 90, 1);
-  -moz-box-shadow: 0px 5px 33px -21px rgba(66, 68, 90, 1);
-  box-shadow: 0px 5px 33px -21px rgba(66, 68, 90, 1);
-}
 
 .img {
   width: 100%;
@@ -60,43 +43,12 @@
   line-height: 25px;
 }
 
-.cardButton {
-  border: none;
-  border-radius: 10px;
-  background-color: rgba(53, 16, 102, 0.678);
-  padding: 10px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
 .post {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.postImg {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  margin-bottom: 20px;
-}
-
-.postDesc {
-  padding: 0 100px;
-  font-size: 24px;
-  font-weight: 300;
-  color: gray;
-  margin-top: 50px;
-}
-
-.postLongDesc {
-  padding: 100px;
-  padding-top: 50px;
-  font-size: 18px;
-  line-height: 24px;
-}
 
 .login {
   height: calc(100vh - 50px);
@@ -117,14 +69,15 @@
 }
 
 
-.left,.right{
+.left,
+.right {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.center{
+.center {
   height: 100%;
   display: flex;
   align-items: center;
@@ -132,7 +85,7 @@
   position: relative;
 }
 
-.or{
+.or {
   border: 2px solid lightgray;
   border-radius: 50%;
   padding: 10px;
@@ -141,20 +94,8 @@
   font-weight: bold;
 }
 
-.line{
-  width: 0.5px;
-  height: 70%;
-  background-color: lightgray;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  z-index: -1;
-}
 
-.loginButton{
+.loginButton {
   width: 150px;
   padding: 15px 25px;
   border-radius: 5px;
@@ -166,29 +107,31 @@
   cursor: pointer;
 }
 
-.google{
+.google {
   background-color: #df4930;
 }
-.facebook{
+
+.facebook {
   background-color: #507cc0;
 }
-.github{
+
+.github {
   background-color: black;
 }
 
-.icon{
+.icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
 
-input{
+input {
   width: 200px;
   padding: 15px 20px;
   margin-bottom: 20px;
 }
 
-.submit{
+.submit {
   width: 200px;
   background-color: rgba(128, 0, 128, 0.671);
   color: white;
@@ -198,23 +141,18 @@ input{
   border-radius: 5px;
 }
 
-.loginTitle{
+.loginTitle {
   position: absolute;
   top: 150px;
-  color:lightgray
+  color: lightgray
 }
 
-.link{
+.link {
   color: inherit;
   text-decoration: none;
 }
 
 @media screen and (max-width: 992px) {
-  .card {
-    width: 100%;
-    margin-bottom: 50px;
-  }
-
   .wrapper {
     width: 65%;
     height: 90%;
