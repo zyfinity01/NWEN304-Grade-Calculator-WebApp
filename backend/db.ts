@@ -1,14 +1,18 @@
 const {MongoClient, ServerApiVersion} = require('mongodb');
+const ENV = process.env;
 
 async function connect() {
-    const uri = process.env.MONGO_URL.slice(1, -1)
-    const client = new MongoClient(uri, {
-        serverApi: {
-            version: ServerApiVersion.v1,
-            strict: true,
-            deprecationErrors: true,
-        }
-    });
+    const client = new MongoClient("mongodb+srv://" +
+        ENV.MONGO_USER + ":" +
+        ENV.MONGO_PASS + "@" +
+        ENV.MONGO_SERVER + "/?retryWrites=true&w=majority",
+        {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,   
+                deprecationErrors: true,
+            }
+        });
     return client.connect();
 }
 
