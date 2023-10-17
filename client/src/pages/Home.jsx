@@ -1,7 +1,8 @@
 // Home.js
 import React, { useState } from 'react';
 import "./Home.css";
-//import "../CalcLogic.js";
+import * as CalcLogic from '../CalcLogic';
+
 
 const Home = () => {
     const [course, setCourse] = useState('');
@@ -10,6 +11,12 @@ const Home = () => {
     const handleGradeCalculation = () => {
         console.log('Calculating grades...');
     };
+
+    const handleSaveGrades = () => {
+        console.log('Saving grades...');
+
+    };
+
 
     return (
         <div className="homeContainer">
@@ -33,9 +40,14 @@ const Home = () => {
                     placeholder="Enter Grade"
                     className="gradeInput"
                 />
+                <button onClick={handleSaveGrades} className="calculateBtn">
+                    Save Grades
+                </button>
+
                 <button onClick={handleGradeCalculation} className="calculateBtn">
                     Calculate Grades - test
                 </button>
+                
 
             </div>
         </div>
