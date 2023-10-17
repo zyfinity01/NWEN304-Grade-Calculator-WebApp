@@ -1,13 +1,7 @@
-//import "../../db.js"
-
-const readline = require('readline');
+// CalcLogic.js
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
+// Connection to MongoDB
 async function connect() {
     const uri = process.env.MONGO_URL.slice(1, -1);
     const client = new MongoClient(uri, {
@@ -20,17 +14,20 @@ async function connect() {
     return client.connect();
 }
 
+// Get the respective collection
 async function getCollection(collectionName) {
     const conn = await connect();
     return conn.db('gradeapp').collection(collectionName);
 }
 
-async function saveGrade(course, gradeLetter) {
-    const collection = await getCollection('courses'); // Save to the 'courses' collection
-    const result = await collection.insertOne({ course, grade: gradeLetter });
+// Save the grade to MongoDB
+async function saveGrade(studentUsername, course, gradeLetter) {
+    const collection = await getCollection('courses');
+    const result = await collection.insertOne({ username: studentUsername, course, grade: gradeLetter });
     return result.insertedCount > 0;
 }
 
+// Calculate the grade based on score
 function calculateGrade(score) {
     if (score >= 90) {
         return 'A';
@@ -47,28 +44,25 @@ function calculateGrade(score) {
     }
 }
 
-rl.question('Enter the course name: ', (course) => {
-    rl.question('Enter the score: ', async (scoreStr) => {
-        const score = parseInt(scoreStr, 10);
-        const gradeLetter = calculateGrade(score);
+// Function to handle grade calculation and save to MongoDB
+async function handleGradeCalculation(studentUsername, course, score) {
+    const gradeLetter = calculateGrade(score);
 
-        if (gradeLetter === 'Invalid input') {
-            console.error('Please provide a valid score.');
-            rl.close();
-            return;
-        }
+    if (gradeLetter === 'Invalid input') {
+        console.error('Please provide a valid score.');
+        return;
+    }
 
-        try {
-            const saved = await saveGrade(course, gradeLetter);
-            if (saved) {
-                console.log(`Saved the grade for course "${course}": ${gradeLetter}`);
-            } else {
-                console.error('Failed to save the grade to MongoDB.');
-            }
-        } catch (error) {
-            console.error('Error saving to MongoDB:', error);
-        } finally {
-            rl.close();
+    try {
+        const saved = await saveGrade(studentUsername, course, gradeLetter);
+        if (saved) {
+            console.log(`Saved the grade for course "${course}": ${gradeLetter}`);
+        } else {
+            console.error('Failed to save the grade to MongoDB.');
         }
-    });
-});
+    } catch (error) {
+        console.error('Error saving to MongoDB:', error);
+    }
+}
+
+module.exports = { handleGradeCalculation };
