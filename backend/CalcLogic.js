@@ -65,4 +65,4 @@ async function handleGradeCalculation(studentUsername, course, score) {
     }
 }
 
-module.exports = { handleGradeCalculation };
+module.exports = { handleGradeCalculation, saveGrade, calculateGrade, connect, getCollection };
