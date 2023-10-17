@@ -22,11 +22,28 @@ async function getStudent(studentId) {
     return students.findOne({studentId});
 }
 
+async function getCourse(courseId) {
+    const courses = await getCollection('courses');
+    return courses.findOne({courseId});
+}
+
 async function putStudent(studentId, document) {
     const students = await getCollection('students');
     try {
         await students.insertOne({
-            studentId: studentId,
+            ...document
+        });
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
+async function putCourse(courseId, document) {
+    const courses = await getCollection('courses');
+    try {
+        await courses.insertOne({
             ...document
         });
         return true;
@@ -47,10 +64,32 @@ async function updateStudent(studentId, document) {
     }
 }
 
+async function updateCourse(courseId, document) {
+    const courses = await getCollection('courses');
+    try {
+        await courses.updateOne({courseId}, {$set: document});
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
 async function deleteStudent(studentId) {
     const students = await getCollection('students');
     try {
         await students.deleteOne({studentId});
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
+async function deleteCourse(courseId) {
+    const courses = await getCollection('courses');
+    try {
+        await courses.deleteOne({courseId});
         return true;
     } catch (e) {
         console.log(e);
