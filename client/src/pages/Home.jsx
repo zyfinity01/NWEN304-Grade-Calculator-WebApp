@@ -1,7 +1,6 @@
 // Home.js
 import React, { useState } from 'react';
 import "./Home.css";
-import * as CalcLogic from '../CalcLogic';
 
 
 const Home = () => {
@@ -10,7 +9,29 @@ const Home = () => {
 
     const handleGradeCalculation = () => {
         console.log('Calculating grades...');
+        const data = {
+            studentUsername: 'yourUsername',
+            course: course,
+            score: parseFloat(grade)
+        };
+
+        fetch('http://localhost:5000/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     };
+
+
 
     const handleSaveGrades = () => {
         console.log('Saving grades...');
