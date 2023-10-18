@@ -27,6 +27,22 @@ async function getCourse(courseId) {
     return courses.findOne({courseId});
 }
 
+async function saveGrade(studentId, courseId, grade) {
+    const students = await getCollection('students');
+
+    // First, try to remove any existing grade for the same course (to avoid duplicates)
+    await students.updateOne({ studentId }, { $pull: { grades: { courseId: courseId } } });
+
+    // Then, add the new grade for the course
+    try {
+        await students.updateOne({ studentId }, { $push: { grades: { courseId, grade } } });
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
 async function putStudent(studentId, document) {
     const students = await getCollection('students');
     try {

@@ -22,7 +22,30 @@ passport.use(
       callbackURL: "/auth/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
-      done(null, profile);
+      const students = db.collection('students');
+
+      students.findOne({ oauthID: profile.id }, function (err, user) {
+        if (err) {
+          console.log(err);
+          return done(err);
+        }
+        if (user) {
+          return done(null, user);
+        } else {
+          students.insertOne({
+            oauthID: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            courses: []  // Initially empty
+          }, function (err, newUser) {
+            if (err) {
+              console.log(err);
+              return done(err);
+            }
+            return done(null, newUser);
+          });
+        }
+      });
     }
   )
 );
@@ -53,10 +76,15 @@ passport.use(
   )
 );
 
-passport.serializeUser((user, done) => {
-  done(null, user);
+passport.serializeUser(function (user, done) {
+  done(null, user.oauthID);
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+
+passport.deserializeUser(function (oauthID, done) {
+  const students = db.collection('students');
+  students.findOne({ oauthID: oauthID }, function (err, user) {
+    done(err, user);
+  });
 });
+
