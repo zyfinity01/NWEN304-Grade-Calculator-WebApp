@@ -73,7 +73,7 @@ const Home = () => {
             }
         };
 
-        fetch('http://localhost:5000/saveGrade', { 
+        fetch('http://localhost:5000/saveGrade', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -112,11 +112,11 @@ const Home = () => {
                     placeholder="Enter Grade"
                     className="gradeInput"
                 />
-                <button onClick={handleSaveGrades()} className="calculateBtn">
+                <button onClick={handleSaveGrades} className="calculateBtn">
                     Save Grades
                 </button>
 
-                <button onClick={handleGradeCalculation()} className="calculateBtn">
+                <button onClick={handleGradeCalculation} className="calculateBtn">
                     Calculate Grades - test
                 </button>
 
