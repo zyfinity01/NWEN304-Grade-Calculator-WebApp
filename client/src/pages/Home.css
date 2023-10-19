@@ -5,20 +5,39 @@
     padding: 50px 0;
 }
 
-.gradeCalculationUI {
-    margin-top: 10px;
+.gradeCalculationUI,
+.targetGradeUI,
+.coursesDisplay {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    /* This creates a 10px gap between items in the flex container */
+    gap: 15px;
 }
 
-.courseAndButton {
+.courseAndButton,
+.modal {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    /* Vertically aligns items in the flex container */
-    gap: 10px;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* This ensures the modal stays on top */
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .courseInput,
@@ -27,18 +46,38 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     flex-grow: 1;
-    /* Allows the input to take up available space */
+    margin-bottom: 10px;
 }
 
-.calculateBtn {
-    padding: 10px;
+.calculateBtn,
+.button {
+    padding: 10px 20px;
     background-color: #004b34;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.calculateBtn:hover {
+.calculateBtn:hover,
+.button:hover {
     background-color: #003b24;
+}
+
+/* Specific styles for modal actions */
+.modal .button {
+    margin-top: 10px;
+}
+
+/* Styling the dynamic assignment fields */
+.modal > div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.modal input {
+    flex: 1; /* Allow inputs to equally take up the available width */
 }
