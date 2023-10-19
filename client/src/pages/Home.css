@@ -5,28 +5,73 @@
     padding: 50px 0;
 }
 
-.gradeCalculationUI,
-.targetGradeUI,
-.coursesDisplay {
-    width: 100%;
-    max-width: 600px;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+.addCourseBtn, .fetchCourseBtn {
+    padding: 10px 20px;
+    background-color: #1a73e8;  /* A blue shade */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: absolute;
+    transform: translateY(-50%); /* Center it vertically */
 }
 
+.addCourseBtn {
+    left: 20px;
+    top: 85px;
+}
+
+.addCourseBtn:hover, .fetchCourseBtn:hover {
+    background-color: #155dc2;  /* A slightly darker shade of the button's color on hover */
+}
+
+.fetchCourseBtn {
+    right: 20px;
+    top: 85px;
+}
+
+.coursesList {
+    width: 70%;
+    max-height: 500px;
+    overflow-y: scroll;
+    margin: 20px 0;
+}
+
+.courseCard {
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.courseCard input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.gradeCalculationUI,
+.targetGradeUI,
+.coursesDisplay,
 .courseAndButton,
 .modal {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+}
+
+.gradeCalculationUI,
+.targetGradeUI,
+.coursesDisplay {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
 }
 
 .modal {
@@ -34,9 +79,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000; /* This ensures the modal stays on top */
+    z-index: 1000;
     width: 80%;
     max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
@@ -65,12 +114,10 @@
     background-color: #003b24;
 }
 
-/* Specific styles for modal actions */
 .modal .button {
     margin-top: 10px;
 }
 
-/* Styling the dynamic assignment fields */
 .modal > div {
     display: flex;
     gap: 10px;
@@ -79,5 +126,5 @@
 }
 
 .modal input {
-    flex: 1; /* Allow inputs to equally take up the available width */
+    flex: 1;
 }

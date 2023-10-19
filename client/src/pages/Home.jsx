@@ -1,17 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
+import Slider from "react-slick"; // Import the Slider component
+
 
 const Home = () => {
-  const [courses, setCourses] = useState([]);
+
+    const mockCourses = [
+        {
+          name: 'Math 101',
+          assignments: [
+            {name: 'Assignment 1', grade: 80, weight: 10},
+            {name: 'Exam 1', grade: 90, weight: 40},
+          ],
+          average: 85,
+        },
+        {
+          name: 'Physics 202',
+          assignments: [
+            {name: 'Lab 1', grade: 75, weight: 15},
+            {name: 'Midterm Exam', grade: 88, weight: 30},
+          ],
+          average: 81,
+        },
+        // ... You can add more mock course data here ...
+      ];
+
+  const [courses, setCourses] = useState(mockCourses); // Initialize with mock data
   const [currentUser, setCurrentUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [courseName, setCourseName] = useState('');
   const [assignments, setAssignments] = useState([]);
   const [targetGrade, setTargetGrade] = useState('');
+  const [desiredGrade, setDesiredGrade] = useState(''); // Global desired grade for demo, could be array for per-course setting
+
+
+
+
 
   // Fetch user on component mount
   useEffect(() => {
-    fetch('${process.env.REACT_APP_BACKEND_API_URL}currentUser', {
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}currentUser`, {
       credentials: 'include',
     })
       .then((response) => {
@@ -28,6 +56,30 @@ const Home = () => {
       });
   }, []);
 
+  const fetchCourses = () => {
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}courses`)
+      .then((response) => response.json())
+      .then((data) => {
+        setCourses(data);
+      })
+      .catch((error) => {
+        console.error('There was a problem with the fetch operation:', error.message);
+      });
+  }
+
+  const calculateNeededGrade = (average, desired) => {
+    // Logic to calculate needed grade based on the current average and desired grade
+    return desired - average; // Placeholder logic
+};
+
+const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1
+};
+
   const handleAddCourse = () => {
     const data = {
       studentUsername: currentUser,
@@ -37,7 +89,7 @@ const Home = () => {
       },
     };
 
-    fetch('${process.env.REACT_APP_BACKEND_API_URL}saveCourse', {
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}saveCourse`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,10 +110,6 @@ const Home = () => {
       });
   };
 
-  const fetchCourses = () => {
-    // Fetch courses for the user and update the `courses` state.
-    // Placeholder functionality.
-  };
 
   const addAssignment = () => {
     setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
@@ -77,7 +125,32 @@ const Home = () => {
     <div className="homeContainer">
       <h1>Welcome to the VUW Grade Calculator</h1>
 
-      <button onClick={() => setShowModal(true)}>Add New Course</button>
+      <button className="addCourseBtn" onClick={() => setShowModal(true)}>Add New Course</button>
+
+      <div className="carouselContainer">
+                <Slider {...settings}>
+                    {courses.map((course, index) => (
+                        <div key={index} className="courseCard">
+                            <h2>{course.name}</h2>
+                            {course.assignments.map((assignment, i) => (
+                                <div key={i}>
+                                    <p>{assignment.name}: {assignment.grade}% (Weight: {assignment.weight}%)</p>
+                                </div>
+                            ))}
+                            <h3>Average: {course.average}%</h3>
+                            <input
+                                type="number"
+                                placeholder="Desired Average"
+                                value={desiredGrade}
+                                onChange={e => setDesiredGrade(e.target.value)}
+                            />
+                            <p>You need {calculateNeededGrade(course.average, desiredGrade)}% more to reach your desired grade.</p>
+                        </div>
+                    ))}
+                </Slider>
+            </div>
+
+
 
       {showModal && (
         <div className="modal">
@@ -133,7 +206,7 @@ const Home = () => {
           onChange={(e) => setTargetGrade(e.target.value)}
           placeholder="Desired Average"
         />
-        {/* <button onClick={Fetch or calculate target grade logic here}>Calculate</button> */}
+        <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
       </div>
     </div>
   );
