@@ -10,7 +10,6 @@ const CalcLogic = require('./CalcLogic');
 const app = express();
 
 
-
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
@@ -25,12 +24,12 @@ app.post('/calculate', async (req, res) => {
 });
 
 app.post('/saveGrade', ensureAuthenticated, async (req, res) => {
-  try {
+  /**try {
     const { studentUsername, course } = req.body;
 
     const students = await getCollection('students');
     const result = await students.updateOne(
-      { email: studentUsername }, // Assuming the username is the email
+      { email: studentUsername }, 
       { $push: { courses: course } }
     );
 
@@ -42,11 +41,8 @@ app.post('/saveGrade', ensureAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Error saving grade:', error);
     res.status(500).json({ message: 'Internal Server Error' });
-  }
+  } */
 });
-
-
-
 
 
 app.get('/currentUser', ensureAuthenticated, (req, res) => {
