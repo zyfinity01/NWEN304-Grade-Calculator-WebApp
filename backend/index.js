@@ -5,7 +5,7 @@ const cors = require("cors");
 const passportSetup = require("./passport");
 const passport = require("passport");
 const authRoute = require("./routes/auth");
-const db = require("./db.ts");
+const db = require("./db.js");
 const CalcLogic = require('./CalcLogic');
 const app = express();
 
@@ -18,30 +18,19 @@ function ensureAuthenticated(req, res, next) {
 }
 
 app.post('/calculate', async (req, res) => {
-  const { studentUsername, course, score } = req.body;
-  await CalcLogic.handleGradeCalculation(studentUsername, course, score);
+  console.log(req.body); 
+  //const { studentUsername, course, score } = req.body;
+  // if (!studentUsername || !course || !score) {
+  //   return res.status(400).json({ message: 'Missing required fields' });
+  // }
+
+  //await CalcLogic.handleGradeCalculation(studentUsername, course, score);
   res.json({ message: 'Grade calculated!' });
 });
 
 app.post('/saveGrade', ensureAuthenticated, async (req, res) => {
-  /**try {
-    const { studentUsername, course } = req.body;
-
-    const students = await getCollection('students');
-    const result = await students.updateOne(
-      { email: studentUsername }, 
-      { $push: { courses: course } }
-    );
-
-    if (result.modifiedCount === 1) {
-      res.json({ message: 'Grade saved successfully!' });
-    } else {
-      res.json({ message: 'Failed to save grade!' });
-    }
-  } catch (error) {
-    console.error('Error saving grade:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  } */
+  console.log("test test test --------------------------- test test test");
+  
 });
 
 
@@ -52,6 +41,9 @@ app.get('/currentUser', ensureAuthenticated, (req, res) => {
 
   res.json({ username: req.user.username });
 });
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 app.use(
@@ -64,7 +56,7 @@ app.use(passport.session());
 app.use(
   cors({
     origin: [ process.env.CLIENT_URL, process.env.BACKEND_API_URL ],
-    methods: "GET,POST,PUT,DELETE, FETCH",
+    methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );

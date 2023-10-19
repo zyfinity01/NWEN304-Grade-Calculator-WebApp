@@ -2,7 +2,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GithubStrategy = require("passport-github2").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const passport = require("passport");
-const db = require('./db.ts');
+const db = require('./db.js');
 
 
 const GOOGLE_CLIENT_ID =
@@ -25,38 +25,9 @@ passport.use(
     function (accessToken, refreshToken, profile, done) {
       done(null, profile);
     }
+
   )
 );
-
-
-/**
- * const students = db.collection('students');
-
-      students.findOne({ oauthID: profile.id }, function (err, user) {
-        if (err) {
-          console.log(err);
-          return done(err);
-        }
-        if (user) {
-          return done(null, user);
-        } else {
-          students.insertOne({
-            oauthID: profile.id,
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            courses: []  // Initially empty
-          }, function (err, newUser) {
-            if (err) {
-              console.log(err);
-              return done(err);
-            }
-            return done(null, newUser);
-          });
-        }
-      });
- * 
- */
-
 
 
 passport.use(
@@ -86,14 +57,9 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user);
 });
 
-
-passport.deserializeUser(function (id, done) {
-  const students = db.getCollection('students');
-  students.findOne({ oauthID: id }, function (err, user) {
-    done(err, user);
-  });
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
-
