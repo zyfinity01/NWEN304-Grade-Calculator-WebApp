@@ -59,21 +59,9 @@ function putStudent(studentDocument) {
     const oauthId = studentDocument.oauthId;
     const name = studentDocument.name;
     const email = studentDocument.email;
-    const coursesArray = studentDocument.courses;
 
-    if (!oauthId || !name || !email || !coursesArray) {
+    if (!oauthId || !name || !email) {
         return false;
-    }
-
-    for (let i = 0; i < coursesArray.length; i++) {
-        const courseId = coursesArray[i].courseId;
-
-        // Check if the course exists, if not, error
-        getCourse(courseId).then(course => {
-            if (!course) {
-                return false;
-            }
-        })
     }
 
     return getCollection('students').then(students => {
@@ -81,7 +69,7 @@ function putStudent(studentDocument) {
             oauthId: oauthId,
             name: name,
             email: email,
-            courses: coursesArray
+            courses: []
         })
             .then(() => true)
             .catch(e => {
@@ -156,6 +144,17 @@ function putAssignment(assignmentDocument) {
 function updateStudent(studentId, document) {
     return getCollection('students').then(students => {
         return students.updateOne({studentId}, {$set: document})
+            .then(() => true)
+            .catch(e => {
+                console.log(e);
+                return false;
+            });
+    });
+}
+
+function addCourseToStudent(studentId, courseId) {
+    return getCollection('students').then(students => {
+        return students.updateOne({studentId}, {$push: {courses: courseId}})
             .then(() => true)
             .catch(e => {
                 console.log(e);
