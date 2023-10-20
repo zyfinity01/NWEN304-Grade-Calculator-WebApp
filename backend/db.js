@@ -30,6 +30,12 @@ function getCourse(courseId) {
     });
 }
 
+function getAllCourses(studentId) {
+    return getCollection('courses').then(courses => {
+        return courses.find({studentId: studentId}).toArray();
+    });
+}
+
 function getAssignments(studentId, courseId) {
     return getCollection('assignments').then(assignments => {
         return assignments.find({
