@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const {MongoClient, ServerApiVersion} = require('mongodb');
 
 function connect() {
     const uri = process.env.MONGO_URL.slice(1, -1);
@@ -20,23 +20,32 @@ function getCollection(collectionName) {
 
 function getStudent(studentId) {
     return getCollection('students').then(students => {
-        return students.findOne({ studentId });
+        return students.findOne({studentId});
     });
 }
 
 function getCourse(courseId) {
     return getCollection('courses').then(courses => {
-        return courses.findOne({ courseId });
+        return courses.findOne({courseId});
+    });
+}
+
+function getAssignments(studentId, courseId) {
+    return getCollection('assignments').then(assignments => {
+        return assignments.find({
+            studentId: studentId,
+            courseId: courseId
+        }).toArray();
     });
 }
 
 function saveGrade(studentId, courseId, grade) {
     return getCollection('students').then(students => {
         // First, try to remove any existing grade for the same course (to avoid duplicates)
-        return students.updateOne({ studentId }, { $pull: { grades: { courseId: courseId } } })
+        return students.updateOne({studentId}, {$pull: {grades: {courseId: courseId}}})
             .then(() => {
                 // Then, add the new grade for the course
-                return students.updateOne({ studentId }, { $push: { grades: { courseId, grade } } });
+                return students.updateOne({studentId}, {$push: {grades: {courseId, grade}}});
             })
             .then(() => true)
             .catch(e => {
@@ -103,9 +112,50 @@ function putCourse(courseDocument) {
     });
 }
 
+function putAssignment(assignmentDocument) {
+    const courseId = assignmentDocument.courseId;
+    const studentId = assignmentDocument.studentId;
+    const name = assignmentDocument.name;
+    const weight = assignmentDocument.weight;
+    const grade = assignmentDocument.grade;
+
+    if (!courseId || !studentId || !name || !weight || !grade) {
+        return false;
+    }
+
+    // Check if the course exists, if not, error
+    getCourse(courseId).then(course => {
+        if (!course) {
+            return false;
+        }
+    })
+
+    // Check if the student exists, if not, error
+    getStudent(studentId).then(student => {
+        if (!student) {
+            return false;
+        }
+    })
+
+    return getCollection('assignments').then(assignments => {
+        return assignments.insertOne({
+            courseId: courseId,
+            studentId: studentId,
+            name: name,
+            weight: weight,
+            grade: grade
+        })
+            .then(() => true)
+            .catch(e => {
+                console.log(e);
+                return false;
+            });
+    });
+}
+
 function updateStudent(studentId, document) {
     return getCollection('students').then(students => {
-        return students.updateOne({ studentId }, { $set: document })
+        return students.updateOne({studentId}, {$set: document})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -116,7 +166,18 @@ function updateStudent(studentId, document) {
 
 function updateCourse(courseId, document) {
     return getCollection('courses').then(courses => {
-        return courses.updateOne({ courseId }, { $set: document })
+        return courses.updateOne({courseId}, {$set: document})
+            .then(() => true)
+            .catch(e => {
+                console.log(e);
+                return false;
+            });
+    });
+}
+
+function updateAssignment(assignmentId, document) {
+    return getCollection('assignments').then(assignments => {
+        return assignments.updateOne({assignmentId}, {$set: document})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -127,7 +188,7 @@ function updateCourse(courseId, document) {
 
 function deleteStudent(studentId) {
     return getCollection('students').then(students => {
-        return students.deleteOne({ studentId })
+        return students.deleteOne({studentId})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -138,7 +199,18 @@ function deleteStudent(studentId) {
 
 function deleteCourse(courseId) {
     return getCollection('courses').then(courses => {
-        return courses.deleteOne({ courseId })
+        return courses.deleteOne({courseId})
+            .then(() => true)
+            .catch(e => {
+                console.log(e);
+                return false;
+            });
+    });
+}
+
+function deleteAssignment(assignmentId) {
+    return getCollection('assignments').then(assignments => {
+        return assignments.deleteOne({assignmentId})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -149,7 +221,7 @@ function deleteCourse(courseId) {
 
 function testConnection() {
     return connect().then(conn => {
-        return conn.db(process.env.MONGO_DB_NAME).command({ ping: 1 });
+        return conn.db(process.env.MONGO_DB_NAME).command({ping: 1});
     })
         .then(result => result.ok === 1);
 }
