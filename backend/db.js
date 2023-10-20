@@ -79,7 +79,7 @@ function putStudent(studentDocument) {
     });
 }
 
-function putCourse(courseDocument) {
+function putCourse(studentId, courseDocument) {
     const courseName = courseDocument.courseName;
     const pointValue = courseDocument.pointValue;
 
@@ -87,17 +87,21 @@ function putCourse(courseDocument) {
         return false;
     }
 
-    return getCollection('courses').then(courses => {
-        return courses.insertOne({
+    let createdCourse;
+    getCollection('courses').then(courses => {
+        const doc = courses.insertOne({
             courseName: courseName,
-            pointValue: pointValue
+            pointValue: pointValue,
+            studentId: studentId
         })
-            .then(() => true)
+            .then(() => createdCourse = doc.insertedId)
             .catch(e => {
                 console.log(e);
                 return false;
             });
     });
+
+    return addCourseToStudent(studentId, createdCourse);
 }
 
 function putAssignment(assignmentDocument) {
@@ -154,7 +158,7 @@ function updateStudent(studentId, document) {
 
 function addCourseToStudent(studentId, courseId) {
     return getCollection('students').then(students => {
-        return students.updateOne({studentId}, {$push: {courses: courseId}})
+        return students.updateOne({studentId}, {$push: {courses: {courseId: courseId}}})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -197,13 +201,21 @@ function deleteStudent(studentId) {
 }
 
 function deleteCourse(courseId) {
-    return getCollection('courses').then(courses => {
+    // Get student id from course
+    const studentId = getCourse(courseId).studentId;
+
+    getCollection('courses').then(courses => {
         return courses.deleteOne({courseId})
             .then(() => true)
             .catch(e => {
                 console.log(e);
                 return false;
             });
+    });
+
+    // Delete from student
+    return getCollection('students').then(students => {
+        return students.updateOne({studentId}, {$pull: {courses: {courseId: courseId}}})
     });
 }
 
