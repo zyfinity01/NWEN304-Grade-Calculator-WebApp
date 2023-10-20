@@ -34,6 +34,19 @@ function ensureAuthenticated(req, res, next) {
   res.status(403).json({ message: "Please log in to continue" });
 }
 
+function jwtMiddleware(req, res, next) {
+  const token = req.cookies.jwt;
+  if (!token) return res.status(401).send('Access denied. No token provided.');
+
+  try {
+      const decoded = jwt.verify(token, 'YOUR_JWT_SECRET');
+      req.user = decoded;
+      next();
+  } catch (ex) {
+      res.status(400).send('Invalid token.');
+  }
+}
+
 app.post('/calculate', async (req, res) => {
   console.log(req.body);
   //const { studentUsername, course, score } = req.body;
@@ -45,14 +58,250 @@ app.post('/calculate', async (req, res) => {
   res.json({ message: 'Grade calculated!' });
 });
 
-app.post('/saveGrade', ensureAuthenticated, async (req, res) => {
-  console.log("test test test --------------------------- test test test");
+app.post('/addCourse', ensureAuthenticated, async (req, res) => {
+  console.log("Save course");
+
+  const course = {
+    courseName: req.body.courseName,
+    pointValue: req.body.pointValue
+  };
+
+  try {
+    const existingCourse = await db.getCourse(req.body.courseId);
+
+    if (existingCourse) {
+      await db.updateCourse(req.body.courseId, course);
+      res.status(200).json({ message: "Course updated successfully!" });
+    } else {
+      const newCourseId = await db.putCourse(req.user.id, course);
+      await db.addCourseToStudent(req.user.id, newCourseId);
+      res.status(200).json({ message: "Course added successfully!" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Failed to save course", error: error.message });
+  }
 });
 
-app.get('/currentUser', ensureAuthenticated, (req, res) => {
+
+
+
+app.post('/addStudent', jwtMiddleware, async (req, res) => {
+
+  const student = {
+    name: req.body.name,
+    email: req.body.email,
+    oauthId: req.user.id // assuming this comes from OAuth login
+  };
+
+  try {
+    const success = await db.putStudent(student);
+
+    if (success) {
+      res.status(200).json({ message: "Student added successfully!" });
+    } else {
+      res.status(500).json({ message: "Failed to add student" });
+    }
+
+  } catch (error) {
+    res.status(500).json({ message: "Error adding student", error });
+  }
+
+});
+
+app.post('/addAssignment', async (req, res) => {
+
+  const assignment = {
+    courseId: req.body.courseId,
+    studentId: req.user.id,
+    name: req.body.name,
+    weight: req.body.weight,
+    grade: req.body.grade
+  };
+
+  try {
+
+    const existing = await db.getAssignment(assignment.courseId, assignment.studentId, assignment.name);
+
+    if (existing) {
+      const updated = await db.updateAssignment(existing._id, assignment);
+      if(updated) {
+        res.status(200).json({message: "Assignment updated successfully!"});
+      } else {
+        res.status(500).json({message: "Failed to update assignment"});
+      }
+    } else {
+      const newId = await db.putAssignment(assignment);
+      res.status(201).json({message: "Assignment added successfully!"});
+    }
+
+  } catch (error) {
+    res.status(500).json({message: "Error adding assignment", error});
+  }
+
+});
+
+
+app.post('/addGrade', async (req, res) => {
+
+  const studentId = req.user.id; // get from JWT
+  const courseId = req.body.courseId;
+  const grade = req.body.grade;
+
+  try {
+    const saved = await db.saveGrade(studentId, courseId, grade);
+
+    if(saved) {
+      res.status(200).json({message: "Grade added successfully!"});
+    } else {
+      res.status(500).json({message: "Failed to add grade."});
+    }
+
+  } catch (error) {
+    res.status(500).json({message: "Error adding grade.", error});
+  }
+
+});
+
+
+app.get('/getStudent', jwtMiddleware, async (req, res) => {
+
+  // Validate student ID
+  if(!req.user.id) {
+    return res.status(400).json({message: 'Student ID required'});
+  }
+
+  try {
+    const student = await db.getStudent(req.user.id);
+
+    if(!student) {
+      return res.status(404).json({message: 'Student not found'});
+    }
+
+    // Only return necessary fields
+    const response = {
+      id: student.id,
+      name: student.name,
+      email: student.email
+    };
+
+    res.status(200).json(response);
+
+  } catch (error) {
+
+    // Add better error handling
+    if(error.kind === 'ObjectId') {
+      return res.status(404).json({message: 'Student not found'});
+    }
+
+    console.error(error);
+    res.status(500).json({message: 'Error retrieving student'});
+  }
+
+});
+
+
+/**
+ * Get course by ID
+ */
+app.get('/getCourse/:courseId', jwtMiddleware, async (req, res) => {
+
+  try {
+
+    // Validate courseId parameter
+    if(!req.params.courseId) {
+      return res.status(400).json({error: 'Course ID required'});
+    }
+
+    // Get course from database
+    const course = await db.getCourse(req.params.courseId);
+
+    // Handle not found
+    if(!course) {
+      return res.status(404).json({error: 'Course not found'});
+    }
+
+    // Return subset of fields
+    const response = {
+      id: course._id,
+      name: course.name,
+      points: course.points
+    };
+
+    res.json(response);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: 'Error getting course'});
+  }
+
+});
+
+
+/**
+ * Get grade for a course
+ */
+app.get('/grades/:courseId', jwtMiddleware, async (req, res) => {
+
+  try {
+
+    // Validate courseId parameter
+    if(!req.params.courseId) {
+      return res.status(400).json({error: 'Course ID required'});
+    }
+
+    // Get grade from database
+    const grade = await db.getGrade(req.user.id, req.params.courseId);
+
+    // Handle not found case
+    if(!grade) {
+      return res.status(404).json({error: 'Grade not found'});
+    }
+
+    // Only return grade value
+    res.json({
+      grade: grade.value
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: 'Error getting grade'});
+  }
+
+});
+
+
+app.get('getAssignments/:courseId/:studentId', jwtMiddleware, async (req, res) => {
+
+  try {
+
+    // Get courseId and studentId from request params
+    const { courseId } = req.params;
+
+    // Validate required params
+    if(!courseId || !req.user.id) {
+      return res.status(400).json({error: 'Course ID and Student ID are required'});
+    }
+
+    // Fetch assignments from database
+    const assignments = await db.getAssignments(req.user.id, courseId);
+
+    // Return assignments array
+    res.json(assignments);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({error: 'Error fetching assignments'});
+  }
+
+});
+
+
+
+app.get('/currentUser', jwtMiddleware, (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: "Not Authenticated" });
   }
+
 
   res.json({ username: req.user.username });
 });
