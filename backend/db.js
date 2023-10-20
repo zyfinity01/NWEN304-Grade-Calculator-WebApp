@@ -46,9 +46,34 @@ function saveGrade(studentId, courseId, grade) {
     });
 }
 
-function putStudent(studentId, document) {
+function putStudent(studentDocument) {
+    const oauthId = studentDocument.oauthId;
+    const name = studentDocument.name;
+    const email = studentDocument.email;
+    const coursesArray = studentDocument.courses;
+
+    if (!oauthId || !name || !email || !coursesArray) {
+        return false;
+    }
+
+    for (let i = 0; i < coursesArray.length; i++) {
+        const courseId = coursesArray[i].courseId;
+
+        // Check if the course exists, if not, error
+        getCourse(courseId).then(course => {
+            if (!course) {
+                return false;
+            }
+        })
+    }
+
     return getCollection('students').then(students => {
-        return students.insertOne({ ...document })
+        return students.insertOne({
+            oauthId: oauthId,
+            name: name,
+            email: email,
+            courses: coursesArray
+        })
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -57,9 +82,19 @@ function putStudent(studentId, document) {
     });
 }
 
-function putCourse(courseId, document) {
+function putCourse(courseDocument) {
+    const courseName = courseDocument.courseName;
+    const pointValue = courseDocument.pointValue;
+
+    if (!courseName || !pointValue) {
+        return false;
+    }
+
     return getCollection('courses').then(courses => {
-        return courses.insertOne({ ...document })
+        return courses.insertOne({
+            courseName: courseName,
+            pointValue: pointValue
+        })
             .then(() => true)
             .catch(e => {
                 console.log(e);
