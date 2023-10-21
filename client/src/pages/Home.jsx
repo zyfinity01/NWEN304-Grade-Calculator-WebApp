@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
-import Slider from "react-slick"; // Import the Slider component
+// import Slider from "react-slick"; // Import the Slider component
 
 
 const Home = () => {
@@ -127,7 +127,7 @@ const settings = {
 
       <button className="addCourseBtn" onClick={() => setShowModal(true)}>Add New Course</button>
 
-      <div className="carouselContainer">
+      {/* <div className="carouselContainer">
                 <Slider {...settings}>
                     {courses.map((course, index) => (
                         <div key={index} className="courseCard">
@@ -148,7 +148,7 @@ const settings = {
                         </div>
                     ))}
                 </Slider>
-            </div>
+            </div> */}
 
 
 
