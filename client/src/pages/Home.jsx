@@ -31,7 +31,6 @@ const Home = () => {
   const [courseName, setCourseName] = useState('');
   const [assignments, setAssignments] = useState([]);
   const [targetGrade, setTargetGrade] = useState('');
-  const [desiredGrade, setDesiredGrade] = useState(''); // Global desired grade for demo, could be array for per-course setting
 
 
 
@@ -67,10 +66,6 @@ const Home = () => {
       });
   }
 
-  const calculateNeededGrade = (average, desired) => {
-    // Logic to calculate needed grade based on the current average and desired grade
-    return desired - average; // Placeholder logic
-};
 
 const settings = {
     dots: true,
@@ -89,7 +84,7 @@ const settings = {
       },
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_API_URL}saveCourse`, {
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -126,31 +121,6 @@ const settings = {
       <h1>Welcome to the VUW Grade Calculator</h1>
 
       <button className="addCourseBtn" onClick={() => setShowModal(true)}>Add New Course</button>
-
-      {/* <div className="carouselContainer">
-                <Slider {...settings}>
-                    {courses.map((course, index) => (
-                        <div key={index} className="courseCard">
-                            <h2>{course.name}</h2>
-                            {course.assignments.map((assignment, i) => (
-                                <div key={i}>
-                                    <p>{assignment.name}: {assignment.grade}% (Weight: {assignment.weight}%)</p>
-                                </div>
-                            ))}
-                            <h3>Average: {course.average}%</h3>
-                            <input
-                                type="number"
-                                placeholder="Desired Average"
-                                value={desiredGrade}
-                                onChange={e => setDesiredGrade(e.target.value)}
-                            />
-                            <p>You need {calculateNeededGrade(course.average, desiredGrade)}% more to reach your desired grade.</p>
-                        </div>
-                    ))}
-                </Slider>
-            </div> */}
-
-
 
       {showModal && (
         <div className="modal">
@@ -190,24 +160,16 @@ const settings = {
       )}
 
       <div className="coursesDisplay">
-        {/* Display courses, average grades, and target grades */}
+        {/* Display courses, average grades */}
         {courses.map((course) => (
           <div key={course.id}>
             <h2>{course.courseName}</h2>
-            {/* Display average grade and target grade logic here */}
+            {/* Display average grade */}
           </div>
         ))}
       </div>
-
-      <div className="targetGradeUI">
-        <input
-          type="number"
-          value={targetGrade}
-          onChange={(e) => setTargetGrade(e.target.value)}
-          placeholder="Desired Average"
-        />
-        <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
-      </div>
+      <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
+      
     </div>
   );
 };
