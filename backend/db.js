@@ -5,9 +5,9 @@ let dbClient;
 
 
 async function connect() {
-    if (dbClient && dbClient.isConnected()) {
-        return dbClient;
-    }
+    // if (dbClient && dbClient.isConnected()) {
+    //     return dbClient;
+    // }
 
     const uri = process.env.MONGO_URL.slice(1, -1);
     const client = new MongoClient(uri, {
@@ -29,30 +29,25 @@ function close() {
     }
 }
 
-// function connect() {
-//     const uri = process.env.MONGO_URL.slice(1, -1);
-//     const client = new MongoClient(uri, {
-//         serverApi: {
-//             version: ServerApiVersion.v1,
-//             strict: true,
-//             deprecationErrors: true,
-//         }
-//     });
-//     return client.connect();
-// }
 
 function registerUser(username, password) {
     const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
     return getCollection('users').then(users => {
       return users.insertOne({ username: username, password: hashedPassword });
     });
-  }
+}
 
-  function getUserByUsername(username, callback) {
-    return getCollection('users').then(users => {
-      users.findOne({ username: username }, callback);
+function getUserByUsername(username, callback) {
+return getCollection('users').then(users => {
+    users.findOne({ username: username }, callback);
+});
+}
+
+function getUserByGoogleId(googleId) {
+    return getCollection('students').then(students => {
+        return students.findOne({ oauthId: googleId });
     });
-  }
+}
 
 
 async function getCollection(collectionName) {
@@ -127,7 +122,7 @@ function putStudent(studentDocument) {
     });
 }
 
-function putCourse(studentId, courseDocument) {
+async function putCourse(studentId, courseDocument) {
     const courseName = courseDocument.courseName;
     const pointValue = courseDocument.pointValue;
 
@@ -136,21 +131,22 @@ function putCourse(studentId, courseDocument) {
     }
 
     let createdCourse;
-    getCollection('courses').then(courses => {
-        const doc = courses.insertOne({
+    try {
+        const coursesCollection = await getCollection('courses');
+        const doc = await coursesCollection.insertOne({
             courseName: courseName,
             pointValue: pointValue,
             studentId: studentId
-        })
-            .then(() => createdCourse = doc.insertedId)
-            .catch(e => {
-                console.log(e);
-                return false;
-            });
-    });
+        });
+        createdCourse = doc.insertedId;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
 
     return addCourseToStudent(studentId, createdCourse);
 }
+
 
 function putAssignment(assignmentDocument) {
     const courseId = assignmentDocument.courseId;
@@ -192,6 +188,18 @@ function putAssignment(assignmentDocument) {
             });
     });
 }
+
+function createUserWithGoogle(profile) {
+    return getCollection('students').then(students => {
+        return students.insertOne({
+            oauthId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            courses: []
+        });
+    });
+}
+
 
 function updateStudent(studentId, document) {
     return getCollection('students').then(students => {
@@ -248,24 +256,23 @@ function deleteStudent(studentId) {
     });
 }
 
-function deleteCourse(courseId) {
-    // Get student id from course
-    const studentId = getCourse(courseId).studentId;
+async function deleteCourse(courseId) {
+    const course = await getCourse(courseId);
+    const studentId = course.studentId;
 
-    getCollection('courses').then(courses => {
-        return courses.deleteOne({courseId})
-            .then(() => true)
-            .catch(e => {
-                console.log(e);
-                return false;
-            });
-    });
+    try {
+        const coursesCollection = await getCollection('courses');
+        await coursesCollection.deleteOne({ courseId });
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
 
-    // Delete from student
     return getCollection('students').then(students => {
-        return students.updateOne({studentId}, {$pull: {courses: {courseId: courseId}}})
+        return students.updateOne({ studentId }, { $pull: { courses: { courseId: courseId } } })
     });
 }
+
 
 function deleteAssignment(assignmentId) {
     return getCollection('assignments').then(assignments => {
@@ -303,5 +310,7 @@ module.exports = {
     updateCourse,
     deleteStudent,
     deleteCourse,
-    testConnection
+    testConnection,
+    getUserByGoogleId,
+    createUserWithGoogle
 };
