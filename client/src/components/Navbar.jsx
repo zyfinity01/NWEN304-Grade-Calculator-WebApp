@@ -2,8 +2,7 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 
-
-const Navbar = ({ user }) => {
+const Navbar = ({ user, setShowRegisterModal }) => {
   const logout = () => {
     window.open(`${process.env.REACT_APP_BACKEND_API_URL}auth/logout`, "_self");
   };
@@ -31,7 +30,9 @@ const Navbar = ({ user }) => {
           <Link className="link" to="login">
             Login
           </Link>
+          <button onClick={() => setShowRegisterModal(true)}>Register</button>  {/* Add this button */}
         </div>
+
       )}
     </div>
 

@@ -1,4 +1,5 @@
 const {MongoClient, ServerApiVersion} = require('mongodb');
+const bcrypt = require('bcrypt'); // For password hashing
 
 let dbClient;
 
@@ -15,7 +16,7 @@ async function connect() {
             strict: true,
             deprecationErrors: true,
         },
-        
+
     });
 
     dbClient = await client.connect();
@@ -39,6 +40,20 @@ function close() {
 //     });
 //     return client.connect();
 // }
+
+function registerUser(username, password) {
+    const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
+    return getCollection('users').then(users => {
+      return users.insertOne({ username: username, password: hashedPassword });
+    });
+  }
+
+  function getUserByUsername(username, callback) {
+    return getCollection('users').then(users => {
+      users.findOne({ username: username }, callback);
+    });
+  }
+
 
 async function getCollection(collectionName) {
     const conn = await connect();
@@ -275,6 +290,8 @@ testConnection().then(result => {
 });
 
 module.exports = {
+    registerUser,
+    getUserByUsername,
     connect,
     getCollection,
     getStudent,
