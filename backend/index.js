@@ -18,6 +18,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Connect to the database when the server starts
+db.connect().then(() => {
+  app.listen("5000", () => {
+      console.log("Server is running and connected to the database!");
+  });
+}).catch(err => {
+  console.error("Failed to connect to the database:", err);
+});
+
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.BACKEND_API_URL],
@@ -357,6 +366,6 @@ app.get('/currentUser', jwtMiddleware, (req, res) => {
 
 app.use("/auth", authRoute);
 
-app.listen("5000", () => {
-  console.log("Server is running!");
-});
+// app.listen("5000", () => {
+//   console.log("Server is running!");
+// });
