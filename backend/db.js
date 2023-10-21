@@ -1,21 +1,48 @@
 const {MongoClient, ServerApiVersion} = require('mongodb');
 
-function connect() {
+let dbClient;
+
+
+async function connect() {
+    if (dbClient && dbClient.isConnected()) {
+        return dbClient;
+    }
+
     const uri = process.env.MONGO_URL.slice(1, -1);
     const client = new MongoClient(uri, {
         serverApi: {
             version: ServerApiVersion.v1,
             strict: true,
             deprecationErrors: true,
-        }
+        },
+        
     });
-    return client.connect();
+
+    dbClient = await client.connect();
+    return dbClient;
 }
 
-function getCollection(collectionName) {
-    return connect().then(conn => {
-        return conn.db(process.env.MONGO_DB_NAME).collection(collectionName);
-    });
+function close() {
+    if (dbClient) {
+        dbClient.close();
+    }
+}
+
+// function connect() {
+//     const uri = process.env.MONGO_URL.slice(1, -1);
+//     const client = new MongoClient(uri, {
+//         serverApi: {
+//             version: ServerApiVersion.v1,
+//             strict: true,
+//             deprecationErrors: true,
+//         }
+//     });
+//     return client.connect();
+// }
+
+async function getCollection(collectionName) {
+    const conn = await connect();
+    return conn.db(process.env.MONGO_DB_NAME).collection(collectionName);
 }
 
 function getStudent(studentId) {
