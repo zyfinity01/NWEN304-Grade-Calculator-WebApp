@@ -38,7 +38,7 @@ function jwtMiddleware(req, res, next) {
   if (!token) return res.status(401).send('Access denied. No token provided.');
 
   try {
-      const decoded = jwt.verify(token, 'YOUR_JWT_SECRET');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
       next();
   } catch (ex) {
@@ -57,7 +57,7 @@ app.post('/calculate', async (req, res) => {
   res.json({ message: 'Grade calculated!' });
 });
 
-app.post('/addCourse', ensureAuthenticated, async (req, res) => {
+app.post('/addCourse', jwtMiddleware, async (req, res) => {
   console.log("Save course");
 
   const course = {
@@ -107,7 +107,7 @@ app.post('/addStudent', jwtMiddleware, async (req, res) => {
 
 });
 
-app.post('/addAssignment', async (req, res) => {
+app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
   const assignment = {
     courseId: req.body.courseId,
@@ -140,7 +140,7 @@ app.post('/addAssignment', async (req, res) => {
 });
 
 
-app.post('/addGrade', async (req, res) => {
+app.post('/addGrade', jwtMiddleware, async (req, res) => {
 
   const studentId = req.user.id; // get from JWT
   const courseId = req.body.courseId;
