@@ -320,7 +320,7 @@ app.get('/averageGrade/:courseId', jwtMiddleware, async (req, res) => {
 });
 
 
-app.get('getAssignments/:courseId/:studentId', jwtMiddleware, async (req, res) => {
+app.get('/getAssignments/:courseId/:studentId', jwtMiddleware, async (req, res) => {
 
   try {
 
