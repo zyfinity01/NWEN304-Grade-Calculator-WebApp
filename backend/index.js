@@ -200,6 +200,20 @@ app.get('/getStudent', jwtMiddleware, async (req, res) => {
 });
 
 
+app.get('/getAllCourses', jwtMiddleware, async (req, res) => {
+  try {
+    const courses = await db.getAllCourses(req.user.id);
+    if (!courses) {
+      return res.status(404).json({ message: 'Courses not found for this student.' });
+    }
+    res.status(200).json(courses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching courses.' });
+  }
+});
+
+
 /**
  * Get course by ID
  */
@@ -267,6 +281,42 @@ app.get('/grades/:courseId', jwtMiddleware, async (req, res) => {
     res.status(500).json({error: 'Error getting grade'});
   }
 
+});
+
+app.get('/averageGrade/:courseId', jwtMiddleware, async (req, res) => {
+  try {
+      // Get courseId from request params and studentId from the JWT token
+      const { courseId } = req.params;
+      const studentId = req.user.id;
+
+      // Validate required params
+      if (!courseId || !studentId) {
+          return res.status(400).json({ error: 'Course ID and Student ID are required' });
+      }
+
+      // Fetch assignments from database for the given course and student
+      const assignments = await db.getAssignments(studentId, courseId);
+
+      if (!assignments || assignments.length === 0) {
+          return res.status(404).json({ error: 'No assignments found for the given course and student' });
+      }
+
+      // Calculate the weighted average grade
+      let sumWeightedGrades = 0;
+      let sumWeights = 0;
+      assignments.forEach(assignment => {
+          sumWeightedGrades += assignment.weight * assignment.grade;
+          sumWeights += assignment.weight;
+      });
+      const averageGrade = sumWeightedGrades / sumWeights;
+
+      // Return the calculated average grade
+      res.json({ averageGrade: averageGrade.toFixed(2) });  // rounded to 2 decimal places
+
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error fetching the average grade' });
+  }
 });
 
 
