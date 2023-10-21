@@ -6,7 +6,6 @@ const passportSetup = require("./passport");
 const passport = require("passport");
 const authRoute = require("./routes/auth");
 const db = require("./db.js");
-const CalcLogic = require('./CalcLogic');
 const app = express();
 
 app.use(express.json());
