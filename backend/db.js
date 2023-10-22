@@ -5,9 +5,9 @@ let dbClient;
 
 
 async function connect() {
-    if (dbClient && dbClient.isConnected()) {
-        return dbClient;
-    }
+    // if (dbClient && dbClient.isConnected()) {
+    //     return dbClient;
+    // }
 
     const uri = process.env.MONGO_URL.slice(1, -1);
     const client = new MongoClient(uri, {

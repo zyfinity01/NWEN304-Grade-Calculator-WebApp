@@ -5,25 +5,25 @@ import './Home.css';
 
 const Home = () => {
 
-    const mockCourses = [
-        {
-          name: 'Math 101',
-          assignments: [
-            {name: 'Assignment 1', grade: 80, weight: 10},
-            {name: 'Exam 1', grade: 90, weight: 40},
-          ],
-          average: 85,
-        },
-        {
-          name: 'Physics 202',
-          assignments: [
-            {name: 'Lab 1', grade: 75, weight: 15},
-            {name: 'Midterm Exam', grade: 88, weight: 30},
-          ],
-          average: 81,
-        },
-        // ... You can add more mock course data here ...
-      ];
+  const mockCourses = [
+    {
+      name: 'Math 101',
+      assignments: [
+        { name: 'Assignment 1', grade: 80, weight: 10 },
+        { name: 'Exam 1', grade: 90, weight: 40 },
+      ],
+      average: 85,
+    },
+    {
+      name: 'Physics 202',
+      assignments: [
+        { name: 'Lab 1', grade: 75, weight: 15 },
+        { name: 'Midterm Exam', grade: 88, weight: 30 },
+      ],
+      average: 81,
+    },
+    // ... You can add more mock course data here ...
+  ];
 
   const [courses, setCourses] = useState(mockCourses); // Initialize with mock data
   const [currentUser, setCurrentUser] = useState(null);
@@ -46,12 +46,16 @@ const Home = () => {
         return response.json();
       })
       .then((data) => {
-        setCurrentUser(data.username);
+        setCurrentUser({
+          username: data.username,
+          studentId: data._id // assuming the backend sends the _id as "_id"
+        });
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error.message);
       });
-  }, []);
+  },
+  []);
 
   const fetchCourses = () => {
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`)
@@ -65,18 +69,18 @@ const Home = () => {
   }
 
 
-const settings = {
+  const settings = {
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1
-};
+  };
 
   const handleAddCourse = () => {
     const data = {
       // we need to get studentId here!!
-      studentId: currentUser,
+      studentId: currentUser.studentId,
       courseName: courseName,
       pointValue: 15
     };
@@ -167,7 +171,7 @@ const settings = {
         ))}
       </div>
       <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
-      
+
     </div>
   );
 };
