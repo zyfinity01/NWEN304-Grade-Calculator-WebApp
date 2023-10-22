@@ -38,12 +38,6 @@ app.use(
   })
 );
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(403).json({ message: "Please log in to continue" });
-}
 
 function jwtMiddleware(req, res, next) {
   const token = req.cookies.jwt;
