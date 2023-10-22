@@ -1,4 +1,4 @@
-const {MongoClient, ServerApiVersion} = require('mongodb');
+const {MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
 const bcrypt = require('bcrypt'); // For password hashing
 
 let dbClient;
@@ -62,38 +62,41 @@ async function getCollection(collectionName) {
 
 function getStudent(studentId) {
     return getCollection('students').then(students => {
-        return students.findOne({studentId});
+        return students.findOne({_id: new ObjectId(studentId)});
     });
 }
 
 function getCourse(courseId) {
     return getCollection('courses').then(courses => {
-        return courses.findOne({courseId});
+        return courses.findOne({_id: new ObjectId(courseId)});
     });
 }
 
 function getAllCourses(studentId) {
     return getCollection('courses').then(courses => {
-        return courses.find({studentId: studentId}).toArray();
+        return courses.find({studentId: new ObjectId(studentId)}).toArray();
     });
 }
 
 function getAssignments(studentId, courseId) {
     return getCollection('assignments').then(assignments => {
         return assignments.find({
-            studentId: studentId,
-            courseId: courseId
+            studentId: new ObjectId(studentId),
+            courseId: new ObjectId(courseId)
         }).toArray();
     });
 }
 
 function saveGrade(studentId, courseId, grade) {
+    const studentObjectId = new ObjectId(studentId);
+    const courseObjectId = new ObjectId(courseId);
+
     return getCollection('students').then(students => {
         // First, try to remove any existing grade for the same course (to avoid duplicates)
-        return students.updateOne({studentId}, {$pull: {grades: {courseId: courseId}}})
+        return students.updateOne({_id: studentObjectId}, {$pull: {grades: {courseId: courseObjectId}}})
             .then(() => {
                 // Then, add the new grade for the course
-                return students.updateOne({studentId}, {$push: {grades: {courseId, grade}}});
+                return students.updateOne({_id: studentObjectId}, {$push: {grades: {courseObjectId, grade}}});
             })
             .then(() => true)
             .catch(e => {
@@ -140,7 +143,7 @@ function putCourse(studentId, courseDocument) {
         const doc = courses.insertOne({
             courseName: courseName,
             pointValue: pointValue,
-            studentId: studentId
+            studentId: new ObjectId(studentId)
         })
             .then(() => createdCourse = doc.insertedId)
             .catch(e => {
@@ -179,8 +182,8 @@ function putAssignment(assignmentDocument) {
 
     return getCollection('assignments').then(assignments => {
         return assignments.insertOne({
-            courseId: courseId,
-            studentId: studentId,
+            courseId: new ObjectId(courseId),
+            studentId: new ObjectId(studentId),
             name: name,
             weight: weight,
             grade: grade
@@ -195,7 +198,7 @@ function putAssignment(assignmentDocument) {
 
 function updateStudent(studentId, document) {
     return getCollection('students').then(students => {
-        return students.updateOne({studentId}, {$set: document})
+        return students.updateOne({_id: new ObjectId(studentId)}, {$set: document})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -206,7 +209,7 @@ function updateStudent(studentId, document) {
 
 function addCourseToStudent(studentId, courseId) {
     return getCollection('students').then(students => {
-        return students.updateOne({studentId}, {$push: {courses: {courseId: courseId}}})
+        return students.updateOne({_id: new ObjectId(studentId)}, {$push: {courses: {courseId: new ObjectId(courseId)}}})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -217,7 +220,7 @@ function addCourseToStudent(studentId, courseId) {
 
 function updateCourse(courseId, document) {
     return getCollection('courses').then(courses => {
-        return courses.updateOne({courseId}, {$set: document})
+        return courses.updateOne({_id: new ObjectId(courseId)}, {$set: document})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -228,7 +231,7 @@ function updateCourse(courseId, document) {
 
 function updateAssignment(assignmentId, document) {
     return getCollection('assignments').then(assignments => {
-        return assignments.updateOne({assignmentId}, {$set: document})
+        return assignments.updateOne({_id: new ObjectId(assignmentId)}, {$set: document})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -239,7 +242,7 @@ function updateAssignment(assignmentId, document) {
 
 function deleteStudent(studentId) {
     return getCollection('students').then(students => {
-        return students.deleteOne({studentId})
+        return students.deleteOne({_id: new ObjectId(studentId)})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -253,7 +256,7 @@ function deleteCourse(courseId) {
     const studentId = getCourse(courseId).studentId;
 
     getCollection('courses').then(courses => {
-        return courses.deleteOne({courseId})
+        return courses.deleteOne({_id: new ObjectId(courseId)})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -263,13 +266,13 @@ function deleteCourse(courseId) {
 
     // Delete from student
     return getCollection('students').then(students => {
-        return students.updateOne({studentId}, {$pull: {courses: {courseId: courseId}}})
+        return students.updateOne({_id: studentId}, {$pull: {courses: {courseId: courseId}}})
     });
 }
 
 function deleteAssignment(assignmentId) {
     return getCollection('assignments').then(assignments => {
-        return assignments.deleteOne({assignmentId})
+        return assignments.deleteOne({_id: new ObjectId(assignmentId)})
             .then(() => true)
             .catch(e => {
                 console.log(e);
@@ -285,8 +288,15 @@ function testConnection() {
         .then(result => result.ok === 1);
 }
 
+function testPrintCourses() {
+    getCourse('652dea678676005f3f1fb2e5').then(course => {
+        console.log(course);
+    });
+}
+
 testConnection().then(result => {
     console.log('MongoDB connection test result: ', result);
+    testPrintCourses();
 });
 
 module.exports = {
