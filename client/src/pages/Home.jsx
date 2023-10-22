@@ -75,11 +75,10 @@ const settings = {
 
   const handleAddCourse = () => {
     const data = {
-      studentUsername: currentUser,
-      course: {
-        courseName: courseName,
-        assignments: assignments,
-      },
+      // we need to get studentId here!!
+      studentId: currentUser,
+      courseName: courseName,
+      pointValue: 15
     };
 
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {

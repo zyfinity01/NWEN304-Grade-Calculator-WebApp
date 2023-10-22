@@ -44,16 +44,21 @@ function close() {
 function registerUser(username, password) {
     const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
     return getCollection('users').then(users => {
-      return users.insertOne({ username: username, password: hashedPassword });
+        return users.insertOne({username: username, password: hashedPassword});
     });
-  }
+}
 
-  function getUserByUsername(username, callback) {
+function getUserByUsername(username) {
     return getCollection('users').then(users => {
-      users.findOne({ username: username }, callback);
+        return users.findOne({username: username});
     });
-  }
+}
 
+function getUserByOauthId(oauthId) {
+    return getCollection('students').then(students => {
+        return students.findOne({oauthId: oauthId});
+    });
+}
 
 async function getCollection(collectionName) {
     const conn = await connect();
