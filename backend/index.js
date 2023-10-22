@@ -7,7 +7,10 @@ const passport = require("passport");
 const authRoute = require("./routes/auth");
 const db = require("./db.js");
 const app = express();
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

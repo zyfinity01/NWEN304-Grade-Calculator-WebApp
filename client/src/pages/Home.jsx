@@ -56,7 +56,7 @@ const Home = () => {
   }, []);
 
   const fetchCourses = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_API_URL}courses`)
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`)
       .then((response) => response.json())
       .then((data) => {
         setCourses(data);
@@ -169,7 +169,7 @@ const settings = {
         ))}
       </div>
       <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
-      
+
     </div>
   );
 };
