@@ -34,8 +34,6 @@ const Home = () => {
 
 
 
-
-
   // Fetch user on component mount
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}currentUser`, {
@@ -56,7 +54,7 @@ const Home = () => {
   }, []);
 
   const fetchCourses = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_API_URL}courses`)
+    fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`)
       .then((response) => response.json())
       .then((data) => {
         setCourses(data);
@@ -85,6 +83,7 @@ const settings = {
     };
 
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
+      credentials: 'include',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +97,7 @@ const settings = {
         setCourseName('');
         setAssignments([]);
         setShowModal(false);
-        fetchCourses();
+        //fetchCourses();
       })
       .catch((error) => {
         console.error('Error:', error);
