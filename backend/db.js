@@ -9,7 +9,7 @@ async function connect() {
     //     return dbClient;
     // }
 
-    const uri = process.env.MONGO_URL.slice(1, -1);
+    const uri = process.env.MONGO_URL
     const client = new MongoClient(uri, {
         serverApi: {
             version: ServerApiVersion.v1,
@@ -46,12 +46,13 @@ function registerUser(username, password) {
     bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, function (err, hash) {
             // Store hash in database here
-            doc = putStudent({
+            let studentDoc = {
                 name: username,
                 username: username,
                 hashedPassword: hash,
                 salt: salt
-            });
+            }
+            doc = putStudent(studentDoc);
         });
     });
     return doc;
@@ -179,9 +180,7 @@ function putStudent(studentDocument) {
     const hashedPassword = studentDocument?.hashedPassword;
     const salt = studentDocument?.salt;
 
-    if (!name || (!oauthId && !username && !hashedPassword && !salt)) {
-        return false;
-    }
+    console.log(studentDocument)
 
     if (!oauthId && (username && hashedPassword && salt)) {
         return getCollection('students').then(students => {
