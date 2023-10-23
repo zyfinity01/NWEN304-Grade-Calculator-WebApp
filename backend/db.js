@@ -182,20 +182,20 @@ function putStudent(studentDocument) {
 
     console.log(studentDocument)
 
+    if (!name || (!oauthId && !username && !hashedPassword && !salt)) {
+        return false;
+    }
+
     if (!oauthId && (username && hashedPassword && salt)) {
         return getCollection('students').then(students => {
+            console.log("Inserting student")
             return students.insertOne({
                 name: name,
-                username: username,
-                hashedPassword: hashedPassword,
-                salt: salt,
-                courses: []
-            })
-                .then(() => true)
-                .catch(e => {
-                    console.log(e);
-                    return false;
-                });
+                 username: username,
+                 hashedPassword: hashedPassword,
+                 salt: salt,
+                 courses: []
+             });
         });
     } else if (oauthId && (!username && !hashedPassword && !salt)) {
         return getCollection('students').then(students => {
@@ -203,12 +203,7 @@ function putStudent(studentDocument) {
                 oauthId: oauthId,
                 name: name,
                 courses: []
-            })
-                .then(() => true)
-                .catch(e => {
-                    console.log(e);
-                    return false;
-                });
+            });
         });
     }
 

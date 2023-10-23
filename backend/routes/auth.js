@@ -70,11 +70,11 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  db.registerUser(username, password).then(() => {
+  if (db.registerUser(username, password)) {
     res.json({ success: true, message: "User registered successfully" });
-  }).catch(err => {
-    res.json({ success: false, message: err.message });
-  });
+  } else {
+    res.json({ success: false, message: "Registration failed!" });
+  }
 });
 
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
