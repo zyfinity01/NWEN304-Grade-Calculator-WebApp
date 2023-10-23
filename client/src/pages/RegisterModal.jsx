@@ -12,7 +12,7 @@ const RegisterModal = ({ setShowRegisterModal }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/auth/register', {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL}auth/register`, {
       method: 'POST',
       body: JSON.stringify({username, password})
     });
