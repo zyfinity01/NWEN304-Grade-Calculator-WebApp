@@ -159,11 +159,11 @@ function saveGrade(studentId, courseId, grade) {
 
 
 function putStudent(studentDocument) {
-    const oauthId = studentDocument.oauthId;
-    const name = studentDocument.name;
-    const username = studentDocument.username;
-    const hashedPassword = studentDocument.hashedPassword;
-    const salt = studentDocument.salt;
+    const oauthId = studentDocument?.oauthId;
+    const name = studentDocument?.name;
+    const username = studentDocument?.username;
+    const hashedPassword = studentDocument?.hashedPassword;
+    const salt = studentDocument?.salt;
 
     if (!name || (!oauthId && !username && !hashedPassword && !salt)) {
         return false;
