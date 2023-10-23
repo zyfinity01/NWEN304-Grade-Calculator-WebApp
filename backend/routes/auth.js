@@ -72,6 +72,10 @@ router.post('/register', (req, res) => {
 
   if (db.registerUser(username, password)) {
     res.json({ success: true, message: "User registered successfully" });
+
+    res.body.username = username;
+    res.body.password = password;
+    res.redirect("/login")
   } else {
     res.json({ success: false, message: "Registration failed!" });
   }
