@@ -169,42 +169,48 @@ const Home = () => {
   };
 
   return (
-    <div className="homeContainer">
-      <h1>Welcome to the VUW Grade Calculator</h1>
-      <button className="addCourseBtn" onClick={() => setShowModal(true)}>Add New Course</button>
-      {showModal && (
-        <div className="modal">
+<div className="homeContainer">
+  <h1>Welcome to the VUW Grade Calculator</h1>
+  <button className="addCourseBtn" onClick={() => setShowModal(true)}>Add New Course</button>
+  {showModal && (
+    <div className="modal">
+      <input
+        type="text"
+        value={courseName}
+        onChange={(e) => setCourseName(e.target.value)}
+        placeholder="Course Name"
+      />
+      {assignments.map((assignment, index) => (
+        <div key={index}>
           <input
-            type="text"
-            value={courseName}
-            onChange={(e) => setCourseName(e.target.value)}
-            placeholder="Course Name"
+            value={assignment.name}
+            onChange={(e) => handleAssignmentChange(index, 'name', e.target.value)}
+            placeholder="Assignment Name"
           />
-          {assignments.map((assignment, index) => (
-            <div key={index}>
-              <input
-                value={assignment.name}
-                onChange={(e) => handleAssignmentChange(index, 'name', e.target.value)}
-                placeholder="Assignment Name"
-              />
-              <input
-                type="number"
-                value={assignment.weight}
-                onChange={(e) => handleAssignmentChange(index, 'weight', +e.target.value)}
-                placeholder="Weight"
-              />
-              <input
-                type="number"
-                value={assignment.score}
-                onChange={(e) => handleAssignmentChange(index, 'score', +e.target.value)}
-                placeholder="Score"
-              />
-            </div>
-          ))}
-          <button onClick={addAssignment}>Add Assignment/Exam</button>
-          <button onClick={handleAddCourse}>Save Course</button>
-          <button onClick={() => setShowModal(false)}>Cancel</button>
+          <div style={{ display: 'inline-block', marginRight: '10px' }}>
+            {index === 0 && <label>Weight</label>}
+            <input
+              type="number"
+              value={assignment.weight}
+              onChange={(e) => handleAssignmentChange(index, 'weight', +e.target.value)}
+              placeholder="Weight"
+            />
+          </div>
+          <div style={{ display: 'inline-block' }}>
+            {index === 0 && <label>Score</label>}
+            <input
+              type="number"
+              value={assignment.score}
+              onChange={(e) => handleAssignmentChange(index, 'score', +e.target.value)}
+              placeholder="Score"
+            />
+          </div>
         </div>
+      ))}
+      <button onClick={addAssignment}>Add Assignment/Exam</button>
+      <button onClick={handleAddCourse}>Save Course</button>
+      <button onClick={() => setShowModal(false)}>Cancel</button>
+    </div>
       )}
       <div className="coursesDisplay">
         {courses.map((course, index) => (

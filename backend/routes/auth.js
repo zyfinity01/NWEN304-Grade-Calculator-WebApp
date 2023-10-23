@@ -4,6 +4,13 @@ const passport = require("passport");
 const jwt = require('jsonwebtoken');  // Ensure you have the jsonwebtoken package installed.
 const db = require('../db.js');
 
+const cors = require('cors');
+
+router.use(cors({
+  origin: 'http://localhost:3000',  // specify the exact origin
+  credentials: true,
+}));
+
 
 const CLIENT_URL = process.env.CLIENT_URL;
 
@@ -19,6 +26,22 @@ router.get("/login/success", (req, res) => {
 });
 
 
+function authenticateJWT(req, res, next) {
+  const token = req.cookies.jwt;  // get the token from the cookie named 'jwt'
+
+  if (token) {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+          if (err) {
+              return res.sendStatus(403);  // Forbidden, token is not valid
+          }
+          req.user = decoded;
+          next();
+      });
+  } else {
+      res.sendStatus(401);  // Unauthorized, no token provided
+  }
+}
+
 
 router.get("/login/failed", (req, res) => {
   res.status(401).json({
@@ -32,40 +55,115 @@ router.get("/logout", (req, res) => {
   res.redirect(CLIENT_URL);
 });
 
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
+// router.post('/login', (req, res) => {
+//     const { username, password } = req.body;
 
-    db.getUserByPassword(username, password).then((user) => {
-        if (user) {
-            // User is authenticated, generate JWT token
-            const jwtToken = jwt.sign({
-                mongoid: user._id,
-                username: user.username,
-                displayName: user.name,
-            }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
+//     db.getUserByPassword(username, password).then((user) => {
+//         if (user) {
+//             // User is authenticated, generate JWT token
+//             const jwtToken = jwt.sign({
+//                 mongoid: user._id,
+//                 username: user.username,
+//                 displayName: user.name,
+//             }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
 
-            // Determine the domain for the cookie
-            let cookieDomain;
-            const url = new URL(CLIENT_URL);
-            if (url.hostname.endsWith('.gradecalc.live')) {
-                cookieDomain = '.gradecalc.live';
-            }
+//             // Determine the domain for the cookie
+//             let cookieDomain;
+//             const url = new URL(CLIENT_URL);
+//             if (url.hostname.endsWith('.gradecalc.live')) {
+//                 cookieDomain = '.gradecalc.live';
+//             }
 
-            // Set JWT as a cookie
-            res.cookie('jwt', jwtToken, {
-                httpOnly: true,
-                domain: cookieDomain,  // This will be either ".gradecalc.live" or undefined (for localhost)
-                // ... other options
-            });
+//             // Set JWT as a cookie
+//             res.cookie('jwt', jwtToken, {
+//               httpOnly: true,
+//               domain: cookieDomain,  // This will be either ".gradecalc.live" or undefined (for localhost)
+//               // ... other options
+//           });
 
-            // Redirect to the client URL
-            res.redirect(CLIENT_URL);
-        } else {
-            // Authentication failed
-            res.redirect("/login/failed");
-        }
+//             console.log("Mongo Student ID: " + user._id);
+
+
+//             res.json({ success: true, message: "User logged in successfully" });
+
+//             // Redirect to the client URL
+//             //res.redirect(CLIENT_URL);
+//         } else {
+//             // Authentication failed
+//             res.redirect("/login/failed");
+//         }
+//     });
+// });
+
+
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err); // error occurred while trying to authenticate
+    }
+    if (!user) {
+      return res.redirect("/login/failed"); // authentication failed
+    }
+    
+    // User is authenticated, generate JWT token
+    const jwtToken = jwt.sign({
+      mongoid: user._id,
+      username: user.username,
+      displayName: user.name,
+    }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
+
+    // Determine the domain for the cookie
+    let cookieDomain;
+    const url = new URL(CLIENT_URL);
+    if (url.hostname.endsWith('.gradecalc.live')) {
+      cookieDomain = '.gradecalc.live';
+    }
+
+    // Set JWT as a cookie
+    res.cookie('jwt', jwtToken, {
+      httpOnly: true,
+      domain: cookieDomain,  // This will be either ".gradecalc.live" or undefined (for localhost)
+      // ... other options
     });
+
+    console.log("Mongo Student ID: " + user._id);
+
+    res.json({ success: true, message: "User logged in successfully" });
+    // Optionally, you can use the line below to redirect instead of sending a JSON response
+    //res.redirect(CLIENT_URL);
+  })(req, res, next);
 });
+
+
+const LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    db.getUserByPassword(username, password).then(user => {
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username or password.' });
+      }
+      return done(null, user);
+    }).catch(err => {
+      return done(err);
+    });
+  }
+));
+
+// In order to maintain persistent login sessions, Passport needs to serialize and deserialize users
+passport.serializeUser(function(user, done) {
+  done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+  // Retrieve user from DB based on serialized info
+  db.getUserById(id).then(user => {
+    done(null, user);
+  }).catch(err => {
+    done(err);
+  });
+});
+
 
 router.post('/register', (req, res) => {
   const { username, password } = req.body;
