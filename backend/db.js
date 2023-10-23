@@ -42,11 +42,27 @@ function close() {
 // }
 
 function registerUser(username, password) {
-    const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
-    return getCollection('users').then(users => {
-        return users.insertOne({username: username, password: hashedPassword});
+    let userHash;
+    let hashedPassword;
+    bcrypt
+        .genSalt(10)
+        .then(salt => {
+            console.log(`Salt: ${salt}`);
+            hashedPassword = bcrypt.hash(password, salt);
+        })
+        .then(hash => {
+            console.log(`Hash: ${hash}`);
+            userHash = hash;
+        })
+    return putStudent({
+        oauthId: "",
+        name: username,
+        username: username,
+        hashedPassword: hashedPassword,
+        salt: userHash
     });
 }
+
 
 function getUserByUsername(username) {
     return getCollection('users').then(users => {
@@ -58,6 +74,16 @@ function getUserByOauthId(oauthId) {
     return getCollection('students').then(students => {
         return students.findOne({oauthId: oauthId});
     });
+}
+
+function getUserByPassword(username, password) {
+    let requestedStudent = getUserByUsername(username);
+
+    if (bcrypt.compare(password, requestedStudent.hash)) {
+        return requestedStudent;
+    } else {
+        return null;
+    }
 }
 
 async function getCollection(collectionName) {
@@ -137,14 +163,43 @@ function putStudent(studentDocument) {
     const name = studentDocument.name;
     const username = studentDocument.username;
     const hashedPassword = studentDocument.hashedPassword;
+    const salt = studentDocument.salt;
 
-    if (!name) {
+    if (!name || (!oauthId && !username && !hashedPassword && !salt)) {
         return false;
     }
 
-    if (!oauthId || (!username && !hashedPassword)) {
-        return false;
+    if (!oauthId && (username && hashedPassword && salt)) {
+        return getCollection('students').then(students => {
+            return students.insertOne({
+                name: name,
+                username: username,
+                hashedPassword: hashedPassword,
+                salt: salt,
+                courses: []
+            })
+                .then(() => true)
+                .catch(e => {
+                    console.log(e);
+                    return false;
+                });
+        });
+    } else if (oauthId && (!username && !hashedPassword && !salt)) {
+        return getCollection('students').then(students => {
+            return students.insertOne({
+                oauthId: oauthId,
+                name: name,
+                courses: []
+            })
+                .then(() => true)
+                .catch(e => {
+                    console.log(e);
+                    return false;
+                });
+        });
     }
+
+    // Legacy code to prevent breaking changes
 
     return getCollection('students').then(students => {
         return students.insertOne({
@@ -152,6 +207,7 @@ function putStudent(studentDocument) {
             name: name,
             username: username,
             hashedPassword: hashedPassword,
+            salt: salt,
             courses: []
         })
             .then(() => true)

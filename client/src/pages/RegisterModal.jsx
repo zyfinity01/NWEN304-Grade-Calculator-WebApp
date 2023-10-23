@@ -30,6 +30,7 @@ const RegisterModal = ({ setShowRegisterModal }) => {
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
+          type={'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
