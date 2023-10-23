@@ -108,7 +108,7 @@ const Home = () => {
         courseName: courseName, // referencing the course name for each assignment
         name: assignment.name,
         weight: assignment.weight,
-        grade: assignment.score / 100 // assuming your front end takes a score out of 100, but the backend expects a grade between 0 and 1
+        grade: assignment.score
       };
 
       fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
