@@ -48,10 +48,19 @@ router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 router.get("/google/callback", passport.authenticate("google"), (req, res) => {
   if (req.isAuthenticated()) {
       // User is authenticated, generate JWT token
+      db.connect();
+      db.putStudent({oauthId: req.user.id,
+         name: req.user.displayName,
+          username: req.user.id,
+           hashedPassword: req.user.id}).then(() => {
+      db.getUserByOauthId(req.user.id).then((studentId) => {
+      console.log("Mongo Student ID: " + studentId._id);
       const jwtToken = jwt.sign({
+          mongoid: studentId._id,
           id: req.user.id,
           displayName: req.user.displayName,
       }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
+      
 
       // Determine the domain for the cookie
       let cookieDomain;
@@ -69,6 +78,8 @@ router.get("/google/callback", passport.authenticate("google"), (req, res) => {
 
       // Redirect to the client URL
       res.redirect(CLIENT_URL);
+    });
+  });
   } else {
       // Authentication failed
       res.redirect("/login/failed");

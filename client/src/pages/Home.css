@@ -128,3 +128,23 @@
 .modal input {
     flex: 1;
 }
+
+.contentAndResultsContainer {
+    display: flex;
+    justify-content: space-between;
+    /* Spacing between main content and results box */
+}
+
+.mainContent {
+    width: 70%;
+    /* Taking 70% of the available width */
+}
+
+.resultsBox {
+    width: 25%;
+    /* Taking 25% of the available width */
+    border: 1px solid #ccc;
+    /* Adding a border for distinction */
+    padding: 10px;
+    /* Some padding for inner content */
+}
