@@ -70,15 +70,11 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  if (db.registerUser(username, password)) {
-    res.json({ success: true, message: "User registered successfully" });
-
-    res.body.username = username;
-    res.body.password = password;
-    res.redirect("/login")
-  } else {
-    res.json({ success: false, message: "Registration failed!" });
-  }
+  db.registerUser(username, password).then((user) => {
+      res.json({ success: true, message: "User registered successfully" });
+  }).catch((err) => {
+        res.json({ success: false, message: "User registration failed: " + err });
+  });
 });
 
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
@@ -99,7 +95,7 @@ router.get("/google/callback", passport.authenticate("google"), (req, res) => {
           id: req.user.id,
           displayName: req.user.displayName,
       }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
-      
+
 
       // Determine the domain for the cookie
       let cookieDomain;

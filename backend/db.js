@@ -42,26 +42,23 @@ function close() {
 // }
 
 function registerUser(username, password) {
-    let doc;
-    bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(password, salt, function (err, hash) {
+    return bcrypt.genSalt(10, function (err, salt) {
+        return bcrypt.hash(password, salt, function (err, hash) {
             // Store hash in database here
-            let studentDoc = {
+            return putStudent({
                 name: username,
                 username: username,
                 hashedPassword: hash,
                 salt: salt
-            }
-            doc = putStudent(studentDoc);
+            })
         });
     });
-    return doc;
 }
 
 
 function getUserByUsername(username) {
-    return getCollection('users').then(users => {
-        return users.findOne({username: username});
+    return getCollection('students').then(students => {
+        return students.findOne({username: username});
     });
 }
 
@@ -72,13 +69,16 @@ function getUserByOauthId(oauthId) {
 }
 
 function getUserByPassword(username, password) {
-    let requestedStudent = getUserByUsername(username);
-
-    if (bcrypt.compare(password, requestedStudent.hash)) {
-        return requestedStudent;
-    } else {
+    return getUserByUsername(username).then((student) => {
+        if (bcrypt.compare(password, student.salt)) {
+            return student;
+        } else {
+            return null;
+        }
+    }).catch((err) => {
+        console.log(err);
         return null;
-    }
+    });
 }
 
 async function getCollection(collectionName) {
@@ -180,8 +180,6 @@ function putStudent(studentDocument) {
     const hashedPassword = studentDocument?.hashedPassword;
     const salt = studentDocument?.salt;
 
-    console.log(studentDocument)
-
     if (!name || (!oauthId && !username && !hashedPassword && !salt)) {
         return false;
     }
@@ -191,11 +189,11 @@ function putStudent(studentDocument) {
             console.log("Inserting student")
             return students.insertOne({
                 name: name,
-                 username: username,
-                 hashedPassword: hashedPassword,
-                 salt: salt,
-                 courses: []
-             });
+                username: username,
+                hashedPassword: hashedPassword,
+                salt: salt,
+                courses: []
+            });
         });
     } else if (oauthId && (!username && !hashedPassword && !salt)) {
         return getCollection('students').then(students => {
@@ -388,6 +386,9 @@ function testPrintCourses() {
     getCourse('652dea678676005f3f1fb2e5').then(course => {
         console.log(course);
     });
+    getUserByPassword('user1', 'pass1').then(user => {
+        console.log(user);
+    })
 }
 
 testConnection().then(result => {
