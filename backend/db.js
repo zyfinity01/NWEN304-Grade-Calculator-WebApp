@@ -111,6 +111,7 @@ function saveGrade(studentId, courseId, grade) {
     });
 }
 
+
 function putStudent(studentDocument) {
     const oauthId = studentDocument.oauthId;
     const name = studentDocument.name;
@@ -316,6 +317,7 @@ module.exports = {
     connect,
     getCollection,
     getStudent,
+    getUserByOauthId,
     getCourse,
     saveGrade,
     putStudent,

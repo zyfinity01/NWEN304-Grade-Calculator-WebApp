@@ -78,8 +78,8 @@ app.post('/addCourse', jwtMiddleware, async (req, res) => {
       await db.updateCourse(req.body.courseId, course);
       res.status(200).json({ message: "Course updated successfully!" });
     } else {
-      const newCourseId = await db.putCourse(req.user.id, course);
-      await db.addCourseToStudent(req.user.id, newCourseId);
+      const newCourseId = await db.putCourse(req.user.mongoid, course);
+      await db.addCourseToStudent(req.user.mongoid, newCourseId);
       res.status(200).json({ message: "Course added successfully!" });
     }
   } catch (error) {
@@ -117,7 +117,7 @@ app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
   const assignment = {
     courseId: req.body.courseId,
-    studentId: req.user.id,
+    studentId: req.user.mongoid,
     name: req.body.name,
     weight: req.body.weight,
     grade: req.body.grade
@@ -148,7 +148,7 @@ app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
 app.post('/addGrade', jwtMiddleware, async (req, res) => {
 
-  const studentId = req.user.id; // get from JWT
+  const studentId = req.user.mongoid; // get from JWT
   const courseId = req.body.courseId;
   const grade = req.body.grade;
 
@@ -171,12 +171,12 @@ app.post('/addGrade', jwtMiddleware, async (req, res) => {
 app.get('/getStudent', jwtMiddleware, async (req, res) => {
 
   // Validate student ID
-  if(!req.user.id) {
+  if(!req.user.mongoid) {
     return res.status(400).json({message: 'Student ID required'});
   }
 
   try {
-    const student = await db.getStudent(req.user.id);
+    const student = await db.getStudent(req.user.mongoid);
 
     if(!student) {
       return res.status(404).json({message: 'Student not found'});
@@ -207,7 +207,7 @@ app.get('/getStudent', jwtMiddleware, async (req, res) => {
 
 app.get('/getAllCourses', jwtMiddleware, async (req, res) => {
   try {
-    const courses = await db.getAllCourses(req.user.id);
+    const courses = await db.getAllCourses(req.user.mongoid);
     if (!courses) {
       return res.status(404).json({ message: 'Courses not found for this student.' });
     }
@@ -269,7 +269,7 @@ app.get('/grades/:courseId', jwtMiddleware, async (req, res) => {
     }
 
     // Get grade from database
-    const grade = await db.getGrade(req.user.id, req.params.courseId);
+    const grade = await db.getGrade(req.user.mongoid, req.params.courseId);
 
     // Handle not found case
     if(!grade) {
@@ -292,7 +292,7 @@ app.get('/averageGrade/:courseId', jwtMiddleware, async (req, res) => {
   try {
       // Get courseId from request params and studentId from the JWT token
       const { courseId } = req.params;
-      const studentId = req.user.id;
+      const studentId = req.user.mongoid;
 
       // Validate required params
       if (!courseId || !studentId) {
@@ -333,12 +333,12 @@ app.get('/getAssignments/:courseId/:studentId', jwtMiddleware, async (req, res) 
     const { courseId } = req.params;
 
     // Validate required params
-    if(!courseId || !req.user.id) {
+    if(!courseId || !req.user.mongoid) {
       return res.status(400).json({error: 'Course ID and Student ID are required'});
     }
 
     // Fetch assignments from database
-    const assignments = await db.getAssignments(req.user.id, courseId);
+    const assignments = await db.getAssignments(req.user.mongoid, courseId);
 
     // Return assignments array
     res.json(assignments);
