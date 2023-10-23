@@ -36,38 +36,41 @@ const Home = () => {
     })
       .then((response) => response.json())
       .then(async (fetchedCourses) => {
-        const coursesWithAssignments = await Promise.all(
+        const coursesWithAssignmentsAndAverage = await Promise.all(
           fetchedCourses.map(async (course) => {
-            const response = await fetch(
+            // Fetch assignments
+            const assignmentsResponse = await fetch(
               `${process.env.REACT_APP_BACKEND_API_URL}getAssignments/${course.courseName}`,
               {
                 credentials: 'include',
               }
             );
-            const assignments = await response.json();
+            const assignments = await assignmentsResponse.json();
   
-            // Compute average grade (assuming each assignment has grade and weight properties)
-            const totalWeight = assignments.reduce((acc, assignment) => acc + assignment.weight, 0);
-            const totalGrade = assignments.reduce(
-              (acc, assignment) => acc + assignment.grade * assignment.weight,
-              0
+            // Fetch average grade using your backend endpoint
+            const averageGradeResponse = await fetch(
+              `${process.env.REACT_APP_BACKEND_API_URL}averageGrade/${course.courseName}`,
+              {
+                credentials: 'include',
+              }
             );
-            const averageGrade = totalWeight ? totalGrade / totalWeight : 0;
+            const { averageGrade } = await averageGradeResponse.json();
   
             return {
               ...course,
               assignments,
-              average: averageGrade.toFixed(2),
+              average: averageGrade,
             };
           })
         );
   
-        setCourses(coursesWithAssignments);
+        setCourses(coursesWithAssignmentsAndAverage);
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error.message);
       });
   };
+  
   
 
   const addCourse = (courseName) => {
