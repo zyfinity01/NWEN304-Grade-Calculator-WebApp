@@ -33,15 +33,42 @@ const Home = () => {
   const fetchCourses = () => {
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`, {
       credentials: 'include',
-      })
+    })
       .then((response) => response.json())
-      .then((fetchedCourses) => {
-        setCourses(fetchedCourses);
+      .then(async (fetchedCourses) => {
+        const coursesWithAssignments = await Promise.all(
+          fetchedCourses.map(async (course) => {
+            const response = await fetch(
+              `${process.env.REACT_APP_BACKEND_API_URL}getAssignments/${course.courseName}`,
+              {
+                credentials: 'include',
+              }
+            );
+            const assignments = await response.json();
+  
+            // Compute average grade (assuming each assignment has grade and weight properties)
+            const totalWeight = assignments.reduce((acc, assignment) => acc + assignment.weight, 0);
+            const totalGrade = assignments.reduce(
+              (acc, assignment) => acc + assignment.grade * assignment.weight,
+              0
+            );
+            const averageGrade = totalWeight ? totalGrade / totalWeight : 0;
+  
+            return {
+              ...course,
+              assignments,
+              average: averageGrade.toFixed(2),
+            };
+          })
+        );
+  
+        setCourses(coursesWithAssignments);
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error.message);
       });
   };
+  
 
   const addCourse = (courseName) => {
     const courseData = {
@@ -153,19 +180,19 @@ const Home = () => {
         </div>
       )}
       <div className="coursesDisplay">
-        {courses.map((course, index) => (
-          <div key={index} className="courseCard">
-            <h2>{course.name}</h2>
-            <ul>
-              {course.assignments.map((assignment, aIndex) => (
-                <li key={aIndex}>
-                  {assignment.name}: {assignment.grade} (Weight: {assignment.weight}%)
-                </li>
-              ))}
-            </ul>
-            <p>Average Grade: {course.average}%</p>
-          </div>
-        ))}
+      {courses.map((course, index) => (
+        <div key={index} className="courseCard">
+          <h2>{course.courseName}</h2>
+          <ul>
+            {course.assignments.map((assignment, aIndex) => (
+              <li key={aIndex}>
+                {assignment.name}: {assignment.grade} (Weight: {assignment.weight}%)
+              </li>
+            ))}
+          </ul>
+          <p>Average Grade: {course.average}%</p>
+        </div>
+      ))}
       </div>
       <div className="resultsBox">
         <h3>Grade Calculation Results</h3>
