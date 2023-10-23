@@ -79,7 +79,7 @@ app.post('/addCourse', jwtMiddleware, async (req, res) => {
       res.status(200).json({ message: "Course updated successfully!" });
     } else {
       const newCourseId = await db.putCourse(req.user.mongoid, course);
-      await db.addCourseToStudent(req.user.mongoid, newCourseId);
+      //await db.addCourseToStudent(req.user.mongoid, newCourseId);
       res.status(200).json({ message: "Course added successfully!" });
     }
   } catch (error) {
@@ -115,8 +115,12 @@ app.post('/addStudent', jwtMiddleware, async (req, res) => {
 
 app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
+  courseName = req.body.courseName;
+  const courseId = await db.getCourseIdByCourseName(courseName);
+    
+
   const assignment = {
-    courseId: req.body.courseId,
+    courseId: courseId,
     studentId: req.user.mongoid,
     name: req.body.name,
     weight: req.body.weight,
@@ -125,7 +129,7 @@ app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
   try {
 
-    const existing = await db.getAssignment(assignment.courseId, assignment.studentId, assignment.name);
+    const existing = await db.getAssignment(assignment.studentId, assignment.courseId, assignment.name);
 
     if (existing) {
       const updated = await db.updateAssignment(existing._id, assignment);

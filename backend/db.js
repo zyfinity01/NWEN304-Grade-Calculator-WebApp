@@ -77,6 +77,16 @@ function getCourse(courseId) {
     });
 }
 
+function getCourseIdByCourseName(courseName) {
+    return getCollection('courses').then(courses => {
+        return courses.findOne({courseName: courseName}).then(course => {
+            if (!course) throw new Error("Course not found");
+            return course._id;
+        });
+    });
+}
+
+
 function getAllCourses(studentId) {
     return getCollection('courses').then(courses => {
         return courses.find({studentId: new ObjectId(studentId)}).toArray();
@@ -89,6 +99,16 @@ function getAssignments(studentId, courseId) {
             studentId: new ObjectId(studentId),
             courseId: new ObjectId(courseId)
         }).toArray();
+    });
+}
+
+function getAssignment(studentId, courseId, assignmentName) {
+    return getCollection('assignments').then(assignments => {
+        return assignments.findOne({
+            studentId: new ObjectId(studentId),
+            courseId: new ObjectId(courseId),
+            name: assignmentName // Using MongoDB's default ID field to find the assignment
+        });
     });
 }
 
@@ -319,9 +339,16 @@ module.exports = {
     getStudent,
     getUserByOauthId,
     getCourse,
+    getCourseIdByCourseName,
+    getAllCourses,
+    getAssignment,
+    getAssignments,
+    updateAssignment,
     saveGrade,
     putStudent,
     putCourse,
+    putAssignment,
+    addCourseToStudent,
     updateStudent,
     updateCourse,
     deleteStudent,
