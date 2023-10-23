@@ -22,7 +22,7 @@ const Home = () => {
       ],
       average: 81,
     },
-    // ... You can add more mock course data here ...
+    // ... add more mock course data here ...
   ];
 
   const [courses, setCourses] = useState(mockCourses); // Initialize with mock data
@@ -162,13 +162,24 @@ const Home = () => {
       )}
 
       <div className="coursesDisplay">
-        {/* Display courses, average grades */}
-        {courses.map((course) => (
-          <div key={course.id}>
-            <h2>{course.courseName}</h2>
-            {/* Display average grade */}
+        {courses.map((course, index) => (
+          <div key={index} className="courseCard">
+            <h2>{course.name}</h2>
+            <ul>
+              {course.assignments.map((assignment, aIndex) => (
+                <li key={aIndex}>
+                  {assignment.name}: {assignment.grade} (Weight: {assignment.weight}%)
+                </li>
+              ))}
+            </ul>
+            <p>Average Grade: {course.average}%</p>
           </div>
         ))}
+      </div>
+      <div className="resultsBox">
+        {/* This is the new results box on the right-hand side */}
+        <h3>Grade Calculation Results</h3>
+        {}
       </div>
       <button className="fetchCourseBtn" onClick={fetchCourses}>Fetch Courses</button>
 
