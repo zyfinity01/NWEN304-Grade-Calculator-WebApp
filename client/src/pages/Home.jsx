@@ -30,7 +30,7 @@ const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const [courseName, setCourseName] = useState('');
   const [assignments, setAssignments] = useState([]);
-  const [targetGrade, setTargetGrade] = useState('');
+  //const [targetGrade, setTargetGrade] = useState('');
 
 
 
@@ -60,53 +60,73 @@ const Home = () => {
   const fetchCourses = () => {
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`)
       .then((response) => response.json())
-      .then((data) => {
-        setCourses(data);
+      .then((fetchedCourses) => {
+        setCourses(prevCourses => [...prevCourses, ...fetchedCourses]); // merging previous courses with the fetched ones
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error.message);
       });
-  }
-
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1
   };
 
-  const handleAddCourse = () => {
-    const data = {
-      // we need to get studentId here!!
-      studentId: currentUser.studentId,
+  const addCourse = (courseName) => {
+    const courseData = {
       courseName: courseName,
       pointValue: 15
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
+    return fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
       credentials: 'include',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(courseData),
     })
       .then((response) => response.json())
       .then((data) => {
         console.log(data.message);
-        // Clear modal content and fetch updated courses
-        setCourseName('');
-        setAssignments([]);
-        setShowModal(false);
-        //fetchCourses();
+        return data;
       })
       .catch((error) => {
         console.error('Error:', error);
       });
   };
 
+  const addAssignments = (courseName, assignments) => {
+    assignments.forEach(assignment => {
+      const assignmentData = {
+        courseName: courseName,
+        name: assignment.name,
+        weight: assignment.weight,
+        grade: assignment.score / 100
+      };
+
+      fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assignmentData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.message);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    });
+  };
+
+  const handleAddCourse = () => {
+    addCourse(courseName)
+      .then(() => {
+        addAssignments(courseName, assignments);
+        setCourseName('');
+        setShowModal(false);
+      });
+  };
 
   const addAssignment = () => {
     setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
@@ -117,6 +137,76 @@ const Home = () => {
     newAssignments[index][field] = value;
     setAssignments(newAssignments);
   };
+
+  // const settings = {
+  //   dots: true,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 1,
+  //   slidesToScroll: 1
+  // };
+
+  // const handleAddCourse = () => {
+  //   const courseData = {
+  //     courseName: courseName,
+  //     pointValue: 15
+  //   };
+
+  //   fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
+  //     credentials: 'include',
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(courseData),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log(data.message);
+  //       // Clear modal content and fetch updated courses
+  //       setCourseName('');
+  //       setShowModal(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error:', error);
+  //     });
+
+  //   assignments.forEach(assignment => {
+  //     const assignmentData = {
+  //       courseName: courseName, // referencing the course name for each assignment
+  //       name: assignment.name,
+  //       weight: assignment.weight,
+  //       grade: assignment.score 
+  //     };
+
+  //     fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
+  //       credentials: 'include',
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(assignmentData),
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.message); // log the response from the server for adding the assignment
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error:', error);
+  //       });
+  //   });
+  // };
+
+
+  // const addAssignment = () => {
+  //   setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
+  // };
+
+  // const handleAssignmentChange = (index, field, value) => {
+  //   const newAssignments = [...assignments];
+  //   newAssignments[index][field] = value;
+  //   setAssignments(newAssignments);
+  // };
 
   return (
     <div className="homeContainer">
