@@ -68,23 +68,13 @@ const Home = () => {
       });
   };
 
-
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1
-  };
-
-  const handleAddCourse = () => {
+  const addCourse = (courseName) => {
     const courseData = {
       courseName: courseName,
       pointValue: 15
     };
 
-    fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
+    return fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -95,20 +85,20 @@ const Home = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data.message);
-        // Clear modal content and fetch updated courses
-        setCourseName('');
-        setShowModal(false);
+        return data;
       })
       .catch((error) => {
         console.error('Error:', error);
       });
+  };
 
+  const addAssignments = (courseName, assignments) => {
     assignments.forEach(assignment => {
       const assignmentData = {
-        courseName: courseName, // referencing the course name for each assignment
+        courseName: courseName,
         name: assignment.name,
         weight: assignment.weight,
-        grade: assignment.score
+        grade: assignment.score / 100
       };
 
       fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
@@ -121,7 +111,7 @@ const Home = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data.message); // log the response from the server for adding the assignment
+          console.log(data.message);
         })
         .catch((error) => {
           console.error('Error:', error);
@@ -129,8 +119,14 @@ const Home = () => {
     });
   };
 
-
-
+  const handleAddCourse = () => {
+    addCourse(courseName)
+      .then(() => {
+        addAssignments(courseName, assignments);
+        setCourseName('');
+        setShowModal(false);
+      });
+  };
 
   const addAssignment = () => {
     setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
@@ -141,6 +137,76 @@ const Home = () => {
     newAssignments[index][field] = value;
     setAssignments(newAssignments);
   };
+
+  // const settings = {
+  //   dots: true,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 1,
+  //   slidesToScroll: 1
+  // };
+
+  // const handleAddCourse = () => {
+  //   const courseData = {
+  //     courseName: courseName,
+  //     pointValue: 15
+  //   };
+
+  //   fetch(`${process.env.REACT_APP_BACKEND_API_URL}addCourse`, {
+  //     credentials: 'include',
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(courseData),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log(data.message);
+  //       // Clear modal content and fetch updated courses
+  //       setCourseName('');
+  //       setShowModal(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error:', error);
+  //     });
+
+  //   assignments.forEach(assignment => {
+  //     const assignmentData = {
+  //       courseName: courseName, // referencing the course name for each assignment
+  //       name: assignment.name,
+  //       weight: assignment.weight,
+  //       grade: assignment.score 
+  //     };
+
+  //     fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
+  //       credentials: 'include',
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(assignmentData),
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data.message); // log the response from the server for adding the assignment
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error:', error);
+  //       });
+  //   });
+  // };
+
+
+  // const addAssignment = () => {
+  //   setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
+  // };
+
+  // const handleAssignmentChange = (index, field, value) => {
+  //   const newAssignments = [...assignments];
+  //   newAssignments[index][field] = value;
+  //   setAssignments(newAssignments);
+  // };
 
   return (
     <div className="homeContainer">
