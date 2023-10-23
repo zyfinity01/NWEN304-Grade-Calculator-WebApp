@@ -150,26 +150,33 @@ app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 });
 
 
-app.post('/addGrade', jwtMiddleware, async (req, res) => {
+////////////////////////////////////
 
-  const studentId = req.user.mongoid; // get from JWT
-  const courseId = req.body.courseId;
-  const grade = req.body.grade;
+// REDUNDANT WITH ADD ASSIGNMENT ENDPOINT
 
-  try {
-    const saved = await db.saveGrade(studentId, courseId, grade);
+//////////////////////////////////////
+// app.post('/addGrade', jwtMiddleware, async (req, res) => {
 
-    if(saved) {
-      res.status(200).json({message: "Grade added successfully!"});
-    } else {
-      res.status(500).json({message: "Failed to add grade."});
-    }
+//   const studentId = req.user.mongoid; // get from JWT
+//   const courseName = req.body.courseName;
+//   const grade = req.body.grade;
+//   const courseId = await db.getCourseIdByCourseName(courseName);
 
-  } catch (error) {
-    res.status(500).json({message: "Error adding grade.", error});
-  }
 
-});
+//   try {
+//     const saved = await db.saveGrade(studentId, courseId, grade);
+
+//     if(saved) {
+//       res.status(200).json({message: "Grade added successfully!"});
+//     } else {
+//       res.status(500).json({message: "Failed to add grade."});
+//     }
+
+//   } catch (error) {
+//     res.status(500).json({message: "Error adding grade.", error});
+//   }
+
+// });
 
 
 app.get('/getStudent', jwtMiddleware, async (req, res) => {
@@ -223,80 +230,83 @@ app.get('/getAllCourses', jwtMiddleware, async (req, res) => {
 });
 
 
-/**
- * Get course by ID
- */
-app.get('/getCourse/:courseId', jwtMiddleware, async (req, res) => {
+////////////////////////////////////////////////////////////
+// This seems to be redundant
+////////////////////////////////////////////////
+// app.get('/getCourse/:courseId', jwtMiddleware, async (req, res) => {
 
-  try {
+//   try {
 
-    // Validate courseId parameter
-    if(!req.params.courseId) {
-      return res.status(400).json({error: 'Course ID required'});
-    }
+//     // Validate courseId parameter
+//     if(!req.params.courseId) {
+//       return res.status(400).json({error: 'Course ID required'});
+//     }
 
-    // Get course from database
-    const course = await db.getCourse(req.params.courseId);
+//     // Get course from database
+//     const course = await db.getCourse(req.params.courseId);
 
-    // Handle not found
-    if(!course) {
-      return res.status(404).json({error: 'Course not found'});
-    }
+//     // Handle not found
+//     if(!course) {
+//       return res.status(404).json({error: 'Course not found'});
+//     }
 
-    // Return subset of fields
-    const response = {
-      id: course._id,
-      name: course.name,
-      points: course.points
-    };
+//     // Return subset of fields
+//     const response = {
+//       id: course._id,
+//       name: course.name,
+//       points: course.points
+//     };
 
-    res.json(response);
+//     res.json(response);
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({error: 'Error getting course'});
-  }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({error: 'Error getting course'});
+//   }
 
-});
+// });
 
 
-/**
- * Get grade for a course
- */
-app.get('/grades/:courseId', jwtMiddleware, async (req, res) => {
+/////////////////////////
+// This seems to be redundant
+////////////////////////////
+// app.get('/grades/:courseId', jwtMiddleware, async (req, res) => {
 
-  try {
+//   try {
 
-    // Validate courseId parameter
-    if(!req.params.courseId) {
-      return res.status(400).json({error: 'Course ID required'});
-    }
+//     // Validate courseId parameter
+//     if(!req.params.courseId) {
+//       return res.status(400).json({error: 'Course ID required'});
+//     }
 
-    // Get grade from database
-    const grade = await db.getGrade(req.user.mongoid, req.params.courseId);
+//     // Get grade from database
+//     const grade = await db.getGrade(req.user.mongoid, req.params.courseId);
 
-    // Handle not found case
-    if(!grade) {
-      return res.status(404).json({error: 'Grade not found'});
-    }
+//     // Handle not found case
+//     if(!grade) {
+//       return res.status(404).json({error: 'Grade not found'});
+//     }
 
-    // Only return grade value
-    res.json({
-      grade: grade.value
-    });
+//     // Only return grade value
+//     res.json({
+//       grade: grade.value
+//     });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({error: 'Error getting grade'});
-  }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({error: 'Error getting grade'});
+//   }
 
-});
+// });
 
-app.get('/averageGrade/:courseId', jwtMiddleware, async (req, res) => {
+app.get('/averageGrade/:courseName', jwtMiddleware, async (req, res) => {
   try {
       // Get courseId from request params and studentId from the JWT token
-      const { courseId } = req.params;
+      const { courseName } = req.params;
+      const courseId = await db.getCourseIdByCourseName(courseName);
       const studentId = req.user.mongoid;
+
+      console.log("Course ID: " + courseId);
 
       // Validate required params
       if (!courseId || !studentId) {
@@ -329,12 +339,14 @@ app.get('/averageGrade/:courseId', jwtMiddleware, async (req, res) => {
 });
 
 
-app.get('/getAssignments/:courseId/:studentId', jwtMiddleware, async (req, res) => {
+app.get('/getAssignments/:courseName/', jwtMiddleware, async (req, res) => {
 
   try {
 
     // Get courseId and studentId from request params
-    const { courseId } = req.params;
+    const { courseName } = req.params;
+    const courseId = await db.getCourseIdByCourseName(courseName);
+
 
     // Validate required params
     if(!courseId || !req.user.mongoid) {
