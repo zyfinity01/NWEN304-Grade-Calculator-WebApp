@@ -42,10 +42,11 @@ function close() {
 // }
 
 function registerUser(username, password) {
-    return bcrypt.genSalt(10, function (err, salt) {
-        return bcrypt.hash(password, salt, function (err, hash) {
+    let doc;
+    bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(password, salt, function (err, hash) {
             // Store hash in database here
-            return putStudent({
+            doc = putStudent({
                 name: username,
                 username: username,
                 hashedPassword: hash,
@@ -53,6 +54,7 @@ function registerUser(username, password) {
             });
         });
     });
+    return doc;
 }
 
 
