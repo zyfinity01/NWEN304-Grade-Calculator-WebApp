@@ -114,9 +114,10 @@ app.post('/addStudent', jwtMiddleware, async (req, res) => {
 });
 
 
-app.delete('/deleteCourse/:courseId', jwtMiddleware, async (req, res) => {
+app.delete('/deleteCourse/:courseName', jwtMiddleware, async (req, res) => {
   try {
-    const { courseId } = req.params;
+    const { courseName } = req.params;
+    const courseId = await db.getCourseIdByCourseName(courseName);
 
     // Validate required params
     if (!courseId) {
