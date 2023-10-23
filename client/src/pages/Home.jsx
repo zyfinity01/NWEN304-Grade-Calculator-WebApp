@@ -134,6 +134,30 @@ const Home = () => {
       });
   };
 
+
+  const deleteCourse = async (courseName) => {
+    try {
+      // Deleting assignments for the course
+      await fetch(`${process.env.REACT_APP_BACKEND_API_URL}deleteAssignments/${courseName}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      // Deleting the course itself
+      await fetch(`${process.env.REACT_APP_BACKEND_API_URL}deleteCourse/${courseName}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      // Refetch courses to update UI
+      fetchCourses();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
+
   const addAssignment = () => {
     setAssignments([...assignments, { name: '', weight: 0, score: 0 }]);
   };
@@ -183,19 +207,21 @@ const Home = () => {
         </div>
       )}
       <div className="coursesDisplay">
-      {courses.map((course, index) => (
-        <div key={index} className="courseCard">
-          <h2>{course.courseName}</h2>
-          <ul>
-            {course.assignments.map((assignment, aIndex) => (
-              <li key={aIndex}>
-                {assignment.name}: {assignment.grade} (Weight: {assignment.weight}%)
-              </li>
-            ))}
-          </ul>
-          <p>Average Grade: {course.average}%</p>
-        </div>
-      ))}
+        {courses.map((course, index) => (
+          <div key={index} className="courseCard">
+            <h2>{course.courseName}</h2>
+            <button onClick={() => deleteCourse(course.courseName)}>Delete Course</button> 
+            <ul>
+              {course.assignments.map((assignment, aIndex) => (
+                <li key={aIndex}>
+                  {assignment.name}: {assignment.grade} (Weight: {assignment.weight}%)
+                </li>
+              ))}
+            </ul>
+            <p>Average Grade: {course.average}%</p>
+          </div>
+        ))}
+
       </div>
       <div className="resultsBox">
         <h3>Grade Calculation Results</h3>
