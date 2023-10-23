@@ -113,6 +113,55 @@ app.post('/addStudent', jwtMiddleware, async (req, res) => {
 
 });
 
+
+app.delete('/deleteCourse/:courseName', jwtMiddleware, async (req, res) => {
+  try {
+    const { courseName } = req.params;
+    const courseId = await db.getCourseIdByCourseName(courseName);
+
+    // Validate required params
+    if (!courseId) {
+      return res.status(400).json({ error: 'Course ID is required' });
+    }
+
+    const result = await db.deleteCourse(courseId);
+    if (result) {
+      res.status(200).json({ message: "Course deleted successfully!" });
+    } else {
+      res.status(500).json({ message: "Failed to delete course" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error deleting course', details: error.message });
+  }
+});
+
+
+
+app.delete('/deleteAssignments/:courseName', jwtMiddleware, async (req, res) => {
+  try {
+    const { courseName } = req.params;
+    const courseId = await db.getCourseIdByCourseName(courseName);
+
+    if (!courseId) {
+      return res.status(400).json({ error: 'Course not found' });
+    }
+
+    const result = await db.deleteAssignmentsByCourseId(courseId);
+    if (result) {
+      res.status(200).json({ message: "Assignments deleted successfully!" });
+    } else {
+      res.status(500).json({ message: "Failed to delete assignments" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error deleting assignments', details: error.message });
+  }
+});
+
+
+
+
 app.post('/addAssignment', jwtMiddleware, async (req, res) => {
 
   courseName = req.body.courseName;

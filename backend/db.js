@@ -133,6 +133,26 @@ function getAssignment(studentId, courseId, assignmentName) {
     });
 }
 
+function deleteAssignmentsByCourseId(courseId) {
+    return getCollection('assignments').then(assignments => {
+        return assignments.deleteMany({
+            courseId: new ObjectId(courseId)
+        })
+            .then(result => {
+                if (result.deletedCount > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            })
+            .catch(e => {
+                console.log(e);
+                return false;
+            });
+    });
+}
+
+
 function saveGrade(studentId, courseId, grade) {
     const studentObjectId = new ObjectId(studentId);
     const courseObjectId = new ObjectId(courseId);
@@ -402,6 +422,7 @@ module.exports = {
     updateCourse,
     deleteStudent,
     deleteCourse,
+    deleteAssignmentsByCourseId,
     testConnection,
     getUserByPassword
 };
