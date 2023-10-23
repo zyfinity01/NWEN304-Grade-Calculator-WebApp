@@ -42,24 +42,16 @@ function close() {
 // }
 
 function registerUser(username, password) {
-    let userHash;
-    let hashedPassword;
-    bcrypt
-        .genSalt(10)
-        .then(salt => {
-            console.log(`Salt: ${salt}`);
-            hashedPassword = bcrypt.hash(password, salt);
-        })
-        .then(hash => {
-            console.log(`Hash: ${hash}`);
-            userHash = hash;
-        })
-    return putStudent({
-        oauthId: "",
-        name: username,
-        username: username,
-        hashedPassword: hashedPassword,
-        salt: userHash
+    return bcrypt.genSalt(10, function (err, salt) {
+        return bcrypt.hash(password, salt, function (err, hash) {
+            // Store hash in database here
+            return putStudent({
+                name: username,
+                username: username,
+                hashedPassword: hash,
+                salt: salt
+            });
+        });
     });
 }
 
