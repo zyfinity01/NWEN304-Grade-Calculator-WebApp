@@ -1,2 +1,3 @@
 client/.gitignore
+backend/.env
 client/.env
