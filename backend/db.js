@@ -114,9 +114,14 @@ function saveGrade(studentId, courseId, grade) {
 function putStudent(studentDocument) {
     const oauthId = studentDocument.oauthId;
     const name = studentDocument.name;
-    const email = studentDocument.email;
+    const username = studentDocument.username;
+    const hashedPassword = studentDocument.hashedPassword;
 
-    if (!oauthId || !name || !email) {
+    if (!name) {
+        return false;
+    }
+
+    if (!oauthId || (!username && !hashedPassword)) {
         return false;
     }
 
@@ -124,7 +129,8 @@ function putStudent(studentDocument) {
         return students.insertOne({
             oauthId: oauthId,
             name: name,
-            email: email,
+            username: username,
+            hashedPassword: hashedPassword,
             courses: []
         })
             .then(() => true)
