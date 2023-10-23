@@ -79,3 +79,56 @@ We did not implement any cache headers.
 ### Database Design
 
 We use MongoDB as our database, hosted externally on MongoDB Atlas. We use 3 collections: `students`, `courses`, and `assignments`. The `students` collection stores the student's name, credentials, and the courses and assignments connected to them. The `courses` collection stores the student's courses, and the `assignments` collection stores the student's assignments as well as each one's grade and weighting, which are connected to a course via an ID relation. Each course and assignment is directly connected to a single student via their unique ID.
+
+
+### Exposed API List
+
+POST /addCourse
+
+Purpose: Add or update a course to the database.
+Middleware: jwtMiddleware (checks and verifies JWT token)
+
+POST /addStudent
+
+Purpose: Add a student to the database.
+Middleware: jwtMiddleware
+
+DELETE /deleteCourse/:courseName
+
+Purpose: Delete a course using its name.
+Middleware: jwtMiddleware
+
+DELETE /deleteAssignments/:courseName
+
+Purpose: Delete assignments associated with a particular course.
+Middleware: jwtMiddleware
+
+POST /addAssignment
+
+Purpose: Add or update an assignment for a student in a course.
+Middleware: jwtMiddleware
+
+GET /getStudent
+
+Purpose: Retrieve details of the currently authenticated student.
+Middleware: jwtMiddleware
+
+GET /getAllCourses
+
+Purpose: Retrieve all courses associated with the authenticated student.
+Middleware: jwtMiddleware
+
+GET /averageGrade/:courseName
+
+Purpose: Calculate the average grade for a student in a particular course.
+Middleware: jwtMiddleware
+
+GET /getAssignments/:courseName/
+
+Purpose: Retrieve assignments for the authenticated student in a given course.
+Middleware: jwtMiddleware
+
+GET /currentUser
+
+Purpose: Get details of the currently authenticated user.
+Middleware: jwtMiddleware
