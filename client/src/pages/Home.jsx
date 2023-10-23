@@ -30,7 +30,7 @@ const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const [courseName, setCourseName] = useState('');
   const [assignments, setAssignments] = useState([]);
-  const [targetGrade, setTargetGrade] = useState('');
+  //const [targetGrade, setTargetGrade] = useState('');
 
 
 
@@ -60,13 +60,14 @@ const Home = () => {
   const fetchCourses = () => {
     fetch(`${process.env.REACT_APP_BACKEND_API_URL}getAllCourses`)
       .then((response) => response.json())
-      .then((data) => {
-        setCourses(data);
+      .then((fetchedCourses) => {
+        setCourses(prevCourses => [...prevCourses, ...fetchedCourses]); // merging previous courses with the fetched ones
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error.message);
       });
-  }
+  };
+
 
 
   const settings = {
@@ -78,9 +79,7 @@ const Home = () => {
   };
 
   const handleAddCourse = () => {
-    const data = {
-      // we need to get studentId here!!
-      studentId: currentUser.studentId,
+    const courseData = {
       courseName: courseName,
       pointValue: 15
     };
@@ -91,21 +90,46 @@ const Home = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(courseData),
     })
       .then((response) => response.json())
       .then((data) => {
         console.log(data.message);
         // Clear modal content and fetch updated courses
         setCourseName('');
-        setAssignments([]);
         setShowModal(false);
-        //fetchCourses();
       })
       .catch((error) => {
         console.error('Error:', error);
       });
+
+    assignments.forEach(assignment => {
+      const assignmentData = {
+        courseName: courseName, // referencing the course name for each assignment
+        name: assignment.name,
+        weight: assignment.weight,
+        grade: assignment.score / 100 // assuming your front end takes a score out of 100, but the backend expects a grade between 0 and 1
+      };
+
+      fetch(`${process.env.REACT_APP_BACKEND_API_URL}addAssignment`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assignmentData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.message); // log the response from the server for adding the assignment
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    });
   };
+
+
 
 
   const addAssignment = () => {
