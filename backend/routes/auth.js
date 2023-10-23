@@ -7,7 +7,7 @@ const db = require('../db.js');
 const cors = require('cors');
 
 router.use(cors({
-  origin: 'http://localhost:3000',  // specify the exact origin
+  origin: [process.env.CLIENT_URL, process.env.BACKEND_API_URL],  // specify the exact origin
   credentials: true,
 }));
 
