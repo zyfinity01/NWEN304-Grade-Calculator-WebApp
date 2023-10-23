@@ -409,5 +409,6 @@ module.exports = {
     updateCourse,
     deleteStudent,
     deleteCourse,
-    testConnection
+    testConnection,
+    getUserByPassword
 };

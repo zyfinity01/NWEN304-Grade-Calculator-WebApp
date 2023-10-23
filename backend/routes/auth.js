@@ -32,6 +32,41 @@ router.get("/logout", (req, res) => {
   res.redirect(CLIENT_URL);
 });
 
+router.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    db.getUserByPassword(username, password).then((user) => {
+        if (user) {
+            // User is authenticated, generate JWT token
+            const jwtToken = jwt.sign({
+                mongoid: user._id,
+                username: user.username,
+                displayName: user.name,
+            }, `${process.env.JWT_SECRET}`, { expiresIn: '1h' });  // set expiration as needed
+
+            // Determine the domain for the cookie
+            let cookieDomain;
+            const url = new URL(CLIENT_URL);
+            if (url.hostname.endsWith('.gradecalc.live')) {
+                cookieDomain = '.gradecalc.live';
+            }
+
+            // Set JWT as a cookie
+            res.cookie('jwt', jwtToken, {
+                httpOnly: true,
+                domain: cookieDomain,  // This will be either ".gradecalc.live" or undefined (for localhost)
+                // ... other options
+            });
+
+            // Redirect to the client URL
+            res.redirect(CLIENT_URL);
+        } else {
+            // Authentication failed
+            res.redirect("/login/failed");
+        }
+    });
+});
+
 router.post('/register', (req, res) => {
   const { username, password } = req.body;
 
