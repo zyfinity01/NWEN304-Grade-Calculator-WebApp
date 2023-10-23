@@ -42,6 +42,36 @@ The server will attempt to restart automatically in the event of a crash.
 
 ### Backend Test Scripts
 
+# Set the JWT value
+export JWT_TOKEN="your_jwt_token_here"
+
+# /calculate
+curl -X POST -H "Content-Type: application/json" -d '{"data":"value"}' http://localhost:5000/calculate
+
+# /addCourse
+curl -X POST -H "Content-Type: application/json" -H "Cookie: jwt=$JWT_TOKEN" -d '{"courseName":"courseName","pointValue":"pointValue", "studentId":"studentId"}' http://localhost:5000/addCourse
+
+# /deleteCourse/:courseName
+curl -X DELETE -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/deleteCourse/courseName
+
+# /addAssignment
+curl -X POST -H "Content-Type: application/json" -H "Cookie: jwt=$JWT_TOKEN" -d '{"courseName":"courseName","name":"assignmentName","weight":0.5,"grade":0.9}' http://localhost:5000/addAssignment
+
+# /getStudent
+curl -X GET -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/getStudent
+
+# /getAllCourses
+curl -X GET -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/getAllCourses
+
+# /averageGrade/:courseName
+curl -X GET -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/averageGrade/courseName
+
+# /getAssignments/:courseName/
+curl -X GET -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/getAssignments/courseName
+
+# /currentUser
+curl -X GET -H "Cookie: jwt=$JWT_TOKEN" http://localhost:5000/currentUser
+
 ### Cache Headers/Test Results
 
 We did not implement any cache headers. 
