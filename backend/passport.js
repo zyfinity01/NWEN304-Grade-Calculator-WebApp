@@ -9,8 +9,8 @@ const db = require('./db.js');
 
 
 const GOOGLE_CLIENT_ID =
-  "858240029910-kv2g2850elbu4qi9dlj681gtug8q4bf1.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "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";
+  "googleclientidhere";
+const GOOGLE_CLIENT_SECRET = "secrethere";
 
 
 passport.use(
